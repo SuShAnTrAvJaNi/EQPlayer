@@ -9,7 +9,8 @@
 (function (g) {
   'use strict';
 
-  const CFG = g.EQP_CONFIG || {};
+  const SAVED_CFG = (() => { try { return JSON.parse(localStorage.getItem('eqp-cfg-v1') || '{}'); } catch (e) { return {}; } })();
+  const CFG = Object.assign({}, g.EQP_CONFIG || {}, SAVED_CFG);
   const KEY = 'eqp-stream-auth-v1';
   const SPOTIFY_API = 'https://api.spotify.com/v1';
   const SPOTIFY_ACCOUNTS = 'https://accounts.spotify.com';
