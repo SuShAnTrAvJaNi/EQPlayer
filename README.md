@@ -1,0 +1,2 @@
+# EQPlayer
+Parametric EQ Player
