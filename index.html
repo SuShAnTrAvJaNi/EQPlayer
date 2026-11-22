@@ -15,7 +15,7 @@
 <style>
 :root{--bg:#121212;--card:#181818;--card2:#222;--well:#0b0b0b;--line:#2c2c2c;--line2:#3a3a3a;--txt:#eceff1;--mut:#8a8a8a;--dim:#5c5c5c;--acc:#ffa000;--mid:#ffb300;--hi:#ffca28;--edge:#ffc247;--ink:#1a0f00;--dk:#2a1b00;--deep:#c66900;--rgb:255,160,0;--acc2:#ff8f00;--glow:rgba(255,160,0,.45);--neg:#ff7043;--bad:#ff5252;--kn:60px}
 *{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
-html,body{margin:0;height:100%;width:100%;overflow:hidden;position:fixed;inset:0;background:var(--bg);color:var(--txt);color-scheme:dark;font:15px/1.35 -apple-system,BlinkMacSystemFont,"SF Pro Text",system-ui,sans-serif;-webkit-user-select:none;user-select:none}
+html,body{margin:0;height:100vh;height:100dvh;width:100%;overflow:hidden;position:fixed;inset:0;background:var(--bg);color:var(--txt);color-scheme:dark;font:15px/1.35 -apple-system,BlinkMacSystemFont,"SF Pro Text",system-ui,sans-serif;-webkit-user-select:none;user-select:none}
 #stage{position:absolute;left:0;top:0;width:1024px;height:768px;transform-origin:0 0;display:flex;flex-direction:column;gap:10px;padding:12px;overflow:hidden;contain:layout paint;background:radial-gradient(120% 80% at 50% 0%,#1d1d1d 0%,#121212 62%)}
 
 /* carbon / brushed hardware plates */
@@ -391,6 +391,9 @@ svg.s{fill:none;stroke:currentColor;stroke-width:2;stroke-linecap:round;stroke-l
 .glass,#lyrWrap,#menuBox,.glass-sec{background:linear-gradient(180deg,rgba(255,255,255,.13),rgba(255,255,255,.04));backdrop-filter:blur(26px) saturate(170%);-webkit-backdrop-filter:blur(26px) saturate(170%);border:1px solid rgba(255,255,255,.14);box-shadow:inset 0 1px 0 rgba(255,255,255,.22),0 10px 30px rgba(0,0,0,.35)}
 #menuBox{background:linear-gradient(180deg,rgba(40,40,44,.84),rgba(20,20,22,.92))}
 .glass-sec{border-radius:16px;padding:10px 10px 8px;gap:6px}
+.dsp-badge{display:none;margin:0 0 8px;padding:8px 12px;border-radius:12px;font-size:12px;font-weight:700;letter-spacing:.4px;color:#ffd27a;background:rgba(255,190,80,.12);border:1px solid rgba(255,190,80,.35)}
+body.stream-dsp .dsp-badge{display:block}
+body.stream-dsp #sEq .eqstrip{opacity:.45}
 #streamSec .row{flex-wrap:wrap}
 #streamSec .row button{flex:1 1 130px}
 #streamSec button:disabled{opacity:.4}
@@ -463,6 +466,7 @@ svg.s{fill:none;stroke:currentColor;stroke-width:2;stroke-linecap:round;stroke-l
 </section>
 
 <section class="screen card" id="sEq">
+  <div class="dsp-badge" role="status">DSP Bypassed (DRM stream): EQ, preamp, reverb and meters do not affect this track</div>
   <div class="eqstrip">
     <button id="ab" class="on" title="Switch the EQ on/off to compare">EQ ON</button>
     <select id="preset" aria-label="Preset"></select>
@@ -546,13 +550,13 @@ svg.s{fill:none;stroke:currentColor;stroke-width:2;stroke-linecap:round;stroke-l
   </div>
   <div class="msec glass-sec"><span class="lab">Lyrics</span>
     <button class="mrow sw-row" id="lyrTog" role="switch" aria-checked="false"><span>Show lyrics</span><i class="switch"></i></button>
-    <button class="mrow sw-row" id="lyrAi" role="switch" aria-checked="true"><span>AI fallback<small>transcribe when nothing is found</small></span><i class="switch"></i></button>
+    <button class="mrow sw-row" id="lyrAi" role="switch" aria-checked="false"><span>AI fallback<small>on-device transcription; downloads a model and can be heavy on iPhone memory</small></span><i class="switch"></i></button>
     <div class="note2">Lyrics come from the file's tags, a paired .lrc file, or LRCLIB. The AI fallback runs Whisper locally in a background worker and downloads its model once.</div>
   </div>
   <div class="msec glass-sec" id="streamSec"><span class="lab">Import / Connect Streaming Services</span>
     <button class="mrow" id="spBtn"><span>Spotify</span><small id="spS">Not connected</small></button>
     <button class="mrow" id="amBtn"><span>Apple Music</span><small id="amS">Not connected</small></button>
-        <div class="mrow" style="flex-direction:column;align-items:stretch;gap:6px">
+    <div class="mrow" style="flex-direction:column;align-items:stretch;gap:6px">
       <input id="cfgSp" placeholder="Spotify Client ID" autocomplete="off" style="width:100%">
       <input id="cfgAm" placeholder="Apple developer token" autocomplete="off" style="width:100%">
       <button id="cfgSave">Save keys on this device</button>
@@ -1863,6 +1867,7 @@ function renderNow(t){
 async function loadTrack(id,opts){
   opts=opts||{}; const t=byId(id); if(!t) return;
   if(isStreamTrack(t)) return loadStreamTrack(t,opts);
+  document.body.classList.remove('stream-dsp');
   if(SX.active()) SX.stop();
   const token=++loadToken;
   curId=id; seedWave(id); renderNow(t); markCurrent(); scrollToCurrent(); setCover(null);
@@ -2153,7 +2158,7 @@ const SP_=window.StreamingProviders||{
   play(){return Promise.reject(new Error('Streaming is unavailable.'));},
   pause(){}, resume(){}, seek(){}, setVolume(){}, stop(){}
 };
-const lyrCfg={on:ls.get('eqp-lyrics-on',false)===true, ai:ls.get('eqp-lyrics-ai',true)!==false};
+const lyrCfg={on:ls.get('eqp-lyrics-on',false)===true, ai:ls.get('eqp-lyrics-ai',false)===true};
 let settingsSeen=ls.get('eqp-settings-seen',false)===true;
 function markSettingsSeen(){
   if(settingsSeen) return;
@@ -2364,6 +2369,7 @@ async function loadStreamTrack(t,opts){
   audio.pause(); audio.removeAttribute('src'); audio.load(); srcId=null;
   if(curUrl){ URL.revokeObjectURL(curUrl); curUrl=null; }
   curId=t.id; seedWave(t.id); renderNow(t); markCurrent(); scrollToCurrent();
+  document.body.classList.add('stream-dsp');
   setCover(null);
   if(t.art){
     const art=$('#art'), amb=$('#ambient');
@@ -2393,7 +2399,7 @@ async function init(){
   $('#prev').innerHTML=ICON.prev; $('#next').innerHTML=ICON.next; $('#shuf').innerHTML=ICON.shuf; playBtn.innerHTML=ICON.play;
   fillR(seek);
   applyTheme(false); renderPresetSelect(''); buildSliders(); syncModes(); setBypassGains(true); update(); flushUpdate(); initUI(); fit();
-  if(!screenProf) setTimeout(openDev,250);   // first launch: ask for the device
+  // device setup is optional: Settings > Screen & Device Calibration
   requestAnimationFrame(frame);
   await store.init();
   try{ lib=await store.all(); }catch(e){ lib=[]; }
