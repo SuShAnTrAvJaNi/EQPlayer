@@ -552,6 +552,27 @@ svg.s{fill:none;stroke:currentColor;stroke-width:2;stroke-linecap:round;stroke-l
   <div class="msec glass-sec" id="streamSec"><span class="lab">Import / Connect Streaming Services</span>
     <button class="mrow" id="spBtn"><span>Spotify</span><small id="spS">Not connected</small></button>
     <button class="mrow" id="amBtn"><span>Apple Music</span><small id="amS">Not connected</small></button>
+        <div class="mrow" style="flex-direction:column;align-items:stretch;gap:6px">
+      <input id="cfgSp" placeholder="Spotify Client ID" autocomplete="off" style="width:100%">
+      <input id="cfgAm" placeholder="Apple developer token" autocomplete="off" style="width:100%">
+      <button id="cfgSave">Save keys on this device</button>
+    </div>
+    <script>
+      (function () {
+        var KEY = 'eqp-cfg-v1';
+        var o = {};
+        try { o = JSON.parse(localStorage.getItem(KEY) || '{}'); } catch (e) {}
+        cfgSp.value = o.VITE_SPOTIFY_CLIENT_ID || '';
+        cfgAm.value = o.VITE_APPLE_MUSIC_DEVELOPER_TOKEN || '';
+        cfgSave.onclick = function () {
+          localStorage.setItem(KEY, JSON.stringify({
+            VITE_SPOTIFY_CLIENT_ID: cfgSp.value.trim(),
+            VITE_APPLE_MUSIC_DEVELOPER_TOKEN: cfgAm.value.trim()
+          }));
+          cfgSave.textContent = 'Saved. Reload the page.';
+        };
+      })();
+    </script>
     <div class="row"><button id="spImp" disabled>Import Spotify</button><button id="amImp" disabled>Import Apple</button></div>
     <div class="note2" id="stNote">Streamed tracks play through Spotify's or Apple's own player, so the EQ and reverb do not process them. Local MP3s go through the EQ. Playback needs Spotify Premium or an Apple Music subscription.</div>
   </div>
