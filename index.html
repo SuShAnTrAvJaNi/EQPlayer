@@ -2,21 +2,21 @@
 <html lang="en">
 <head>
 <meta charset="utf-8">
-<meta name="theme-color" content="#121212">
+<meta name="theme-color" content="#000000">
 <meta name="color-scheme" content="dark">
 <meta name="mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-title" content="EQ Player">
-<meta name="apple-mobile-web-app-status-bar-style" content="black">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
 <link rel="manifest" href="manifest.json">
 <link rel="apple-touch-icon" href="icon-180.png">
-<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
-<title>Parametric EQ Player</title>
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no, viewport-fit=cover">
+<title>EQ Player</title>
 <style>
 :root{--bg:#121212;--card:#181818;--card2:#222;--well:#0b0b0b;--line:#2c2c2c;--line2:#3a3a3a;--txt:#eceff1;--mut:#8a8a8a;--dim:#5c5c5c;--acc:#ffa000;--mid:#ffb300;--hi:#ffca28;--edge:#ffc247;--ink:#1a0f00;--dk:#2a1b00;--deep:#c66900;--rgb:255,160,0;--acc2:#ff8f00;--glow:rgba(255,160,0,.45);--neg:#ff7043;--bad:#ff5252;--kn:60px}
 *{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
 html,body{margin:0;height:100vh;height:100dvh;width:100%;overflow:hidden;position:fixed;inset:0;background:var(--bg);color:var(--txt);color-scheme:dark;font:15px/1.35 -apple-system,BlinkMacSystemFont,"SF Pro Text",system-ui,sans-serif;-webkit-user-select:none;user-select:none}
-#stage{position:absolute;left:0;top:0;width:1024px;height:768px;transform-origin:0 0;display:flex;flex-direction:column;gap:10px;padding:12px;overflow:hidden;contain:layout paint;background:radial-gradient(120% 80% at 50% 0%,#1d1d1d 0%,#121212 62%)}
+#stage{position:fixed;inset:0;--knb:92px}
 
 /* carbon / brushed hardware plates */
 header,.card,#mini{background-color:#181818;background-image:repeating-linear-gradient(45deg,rgba(255,255,255,.014) 0 2px,transparent 2px 4px),repeating-linear-gradient(-45deg,rgba(0,0,0,.22) 0 2px,transparent 2px 4px),linear-gradient(180deg,#1d1d1d,#151515);border:1px solid var(--line);box-shadow:inset 0 1px 0 rgba(255,255,255,.05)}
@@ -205,8 +205,7 @@ svg.s{fill:none;stroke:currentColor;stroke-width:2;stroke-linecap:round;stroke-l
 .tprev{height:10px;border-radius:5px;background:linear-gradient(90deg,var(--acc2),var(--hi));box-shadow:0 0 12px var(--glow)}
 
 /* ===================== Poweramp-style shell ===================== */
-#stage{gap:8px;padding:10px 10px 8px;--knb:92px}
-#stage.phone{padding:6px 6px 6px;gap:6px;--knb:78px}
+#stage.phone{--knb:78px}
 #stage.short{--knb:66px}
 #ambWrap{position:absolute;inset:0;overflow:hidden;pointer-events:none;z-index:0}
 #ambient{position:absolute;inset:-40px;background:#000 center/cover no-repeat;filter:blur(36px) saturate(1.3) brightness(.6);opacity:0;transition:opacity .6s;pointer-events:none;z-index:0}
@@ -219,64 +218,6 @@ svg.s{fill:none;stroke:currentColor;stroke-width:2;stroke-linecap:round;stroke-l
 #stage.wide .screen{display:none}
 #stage.wide #sPlayer{display:flex;grid-column:1;grid-row:1}
 #stage.wide.r-library #sLibrary,#stage.wide.r-eq #sEq,#stage.wide.r-search #sSearch{display:flex;grid-column:2;grid-row:1}
-
-/* bottom dock */
-#nav{position:relative;z-index:2;flex:none;display:flex;gap:2px;padding:5px;border-radius:22px;background:rgba(22,22,22,.94);border:1px solid var(--line2);box-shadow:0 8px 24px #000a,inset 0 1px 0 rgba(255,255,255,.06)}
-#nav button{flex:1;min-width:0;flex-direction:column;gap:3px;min-height:50px;padding:4px 2px;border:none;background:transparent;box-shadow:none;color:var(--mut);font-size:10px;font-weight:700;letter-spacing:.4px;border-radius:16px}
-#nav button svg{width:23px;height:23px;flex:none}
-#nav button.act{color:var(--acc);background:rgba(var(--rgb),.14);box-shadow:inset 0 0 0 1px rgba(var(--rgb),.35),0 0 14px rgba(var(--rgb),.18)}
-#stage.wide #nav{align-self:center;width:min(100%,640px)}
-#stage.squat #nav button{min-height:38px}
-#stage.squat #nav button span{display:none}
-
-/* ---- Player ---- */
-#sPlayer{padding:2px 4px 0;gap:10px}
-.artwrap{flex:1 1 0;min-height:0;min-width:0;container-type:size;display:flex;align-items:center;justify-content:center}
-#art{width:80%;height:auto;aspect-ratio:1/1;width:min(100cqw,100cqh);height:min(100cqw,100cqh);border-radius:22px;font-size:84px;background-color:#141414;box-shadow:0 20px 50px #000c,0 0 0 1px rgba(255,255,255,.07)}
-.pright{flex:none;display:flex;flex-direction:column;gap:10px;min-width:0}
-.meta{display:flex;flex-direction:column;align-items:center;gap:2px;min-width:0;text-align:center}
-#sPlayer .title{font-size:22px;font-weight:800;max-width:100%}
-#sPlayer .artist{font-size:16px;max-width:100%}
-#sPlayer .sub{font-size:13px;max-width:100%}
-#tBadge{margin-top:5px;padding:3px 11px;border-radius:999px;border:1px solid rgba(var(--rgb),.55);color:var(--acc);background:rgba(var(--rgb),.08);font-size:11px;font-weight:700;letter-spacing:.8px;white-space:nowrap}
-#tBadge:empty{display:none}
-#wave{flex:1;min-width:0;height:48px;display:block;touch-action:none;cursor:pointer}
-#seek{display:none}
-#sPlayer .transport{gap:10px;align-items:center}
-#sPlayer .transport button{position:relative;width:58px;height:58px;border-radius:50%;background:transparent;border:none;box-shadow:none;color:var(--txt)}
-#sPlayer .transport button svg{width:28px;height:28px}
-#sPlayer .transport button.tog{width:46px;height:46px;color:var(--mut)}
-#sPlayer .transport button.tog svg{width:22px;height:22px}
-#sPlayer .transport button.tog.on{background:none;box-shadow:none;color:var(--acc)}
-#sPlayer .transport button.tog.on::after{content:'';position:absolute;bottom:5px;left:50%;margin-left:-2px;width:4px;height:4px;border-radius:50%;background:var(--acc);box-shadow:0 0 6px var(--acc)}
-#sPlayer .transport button.big{width:80px;height:80px;background:linear-gradient(180deg,var(--mid),var(--acc2));color:var(--ink);box-shadow:0 0 28px var(--glow),inset 0 1px 0 rgba(255,255,255,.45)}
-#sPlayer .transport button.big svg{width:34px;height:34px}
-.tsub{display:flex;justify-content:center;align-items:center;gap:22px;flex:none}
-.tsub button{min-width:48px;height:40px;padding:0 12px;background:transparent;border:1px solid var(--line2);box-shadow:none;border-radius:20px;color:var(--mut)}
-.tsub button.on{color:var(--acc);border-color:var(--acc);background:rgba(var(--rgb),.1)}
-.tsub svg{width:26px;height:20px}
-#sleepLeft{font-size:12px;color:var(--acc)}
-#stage.short #sPlayer .rvol{display:none}
-#stage.landscape:not(.wide) #sPlayer{flex-direction:row;gap:18px;align-items:stretch}
-#stage.landscape:not(.wide) .artwrap{flex:0 1 44%}
-#stage.landscape:not(.wide) .pright{flex:1 1 0;justify-content:center;gap:8px}
-#stage.landscape.short #sPlayer .sub{display:none}
-#stage.phone.landscape #sPlayer .title{font-size:18px}
-#stage.phone.landscape #sPlayer .artist{font-size:14px}
-#stage.phone.landscape #sPlayer .transport button{width:48px;height:48px}
-#stage.phone.landscape #sPlayer .transport button.tog{width:40px;height:40px}
-#stage.phone.landscape #sPlayer .transport button.big{width:62px;height:62px}
-#stage.phone.landscape #wave{height:38px}
-#stage.phone.landscape .tsub button{height:34px}
-#stage.squat #sPlayer .pright{gap:5px}
-#stage.squat #sPlayer .transport button.big{width:54px;height:54px}
-#stage.squat #sPlayer .transport button{width:42px;height:42px}
-#stage.squat #sPlayer .transport button.tog{width:36px;height:36px}
-#stage.squat #wave{height:30px}
-#stage.squat #tBadge{margin-top:2px}
-#stage.wide #sPlayer{flex-direction:column;gap:10px}
-#stage.wide .pright{flex:none;justify-content:flex-start}
-#stage.wide .artwrap{flex:1 1 0}
 
 /* ---- panels shared by Library / EQ / Search ---- */
 #sLibrary,#sEq,#sSearch{padding:8px;gap:8px}
@@ -347,40 +288,6 @@ svg.s{fill:none;stroke:currentColor;stroke-width:2;stroke-linecap:round;stroke-l
 .swdot{width:22px;height:22px;border-radius:50%;background:conic-gradient(from 0deg,#f44,#fd3,#4e4,#3dd,#46f,#e4e,#f44);flex:none}
 #menuBox select{width:100%;min-height:46px}
 
-/* ===================== device setup + calibrator (outside the stage) ===================== */
-#devWrap{position:fixed;inset:0;z-index:100;display:none;align-items:center;justify-content:center;padding:12px;background:rgba(0,0,0,.82)}
-#devWrap.show{display:flex}
-#devBox{width:min(460px,100%);max-height:100%;overflow:auto;-webkit-overflow-scrolling:touch;background:#1a1a1a;border:1px solid var(--line2);border-radius:16px;padding:16px;display:flex;flex-direction:column;gap:10px;box-shadow:0 12px 40px #000}
-#devBox h2{margin:0;font-size:18px}
-#devBox p{margin:0;color:var(--mut);font-size:13px}
-#devBox select{width:100%;min-height:46px;font-size:15px}
-#devInfo{color:var(--txt);font-size:13px;line-height:1.4;background:#101010;border:1px solid var(--line);border-radius:10px;padding:8px 10px}
-#devCur{color:var(--dim);font-size:12px}
-.notdev{font-size:14px;color:var(--mut)}
-.notdev b{color:var(--acc);text-decoration:underline;cursor:pointer;padding:8px 3px;font-weight:700}
-#devBox .btns{display:flex;gap:8px;justify-content:flex-end;margin-top:4px}
-#devBox .btns button{min-height:46px;min-width:96px}
-
-#calWrap{position:fixed;inset:0;z-index:200;display:none;background:#ffffff;touch-action:none;-webkit-touch-callout:none}
-#calWrap.show{display:block}
-#calBox{position:absolute;left:40px;top:40px;right:40px;bottom:40px;background:#000000;color:#fff;display:flex;align-items:center;justify-content:center;overflow:hidden}
-#calBox button{background:#000;color:#fff;border:2px solid #fff;border-radius:8px;box-shadow:none;min-height:44px;font-weight:700;touch-action:none;-webkit-touch-callout:none}
-#calBox button:active{background:#fff;color:#000;filter:none}
-#calBox button.sel{background:#fff;color:#000}
-.cpad{display:flex;flex-direction:column;align-items:center;gap:10px;padding:8px;max-width:100%}
-.cread{font-size:24px;font-weight:800;font-variant-numeric:tabular-nums;letter-spacing:.5px;white-space:nowrap}
-.chint{font-size:12px;color:#bdbdbd;text-align:center;max-width:300px;line-height:1.35}
-.cdpad{display:grid;grid-template-columns:repeat(3,56px);grid-template-rows:repeat(3,56px);gap:6px}
-.cdpad button{width:56px;height:56px;min-height:56px;padding:0;font-size:28px;line-height:1}
-.cdpad .u{grid-column:2;grid-row:1}.cdpad .l{grid-column:1;grid-row:2}.cdpad .r{grid-column:3;grid-row:2}.cdpad .d{grid-column:2;grid-row:3}
-.cdpad i{grid-column:2;grid-row:2;display:flex;align-items:center;justify-content:center;font-style:normal;font-size:10px;color:#777;letter-spacing:1px}
-.cmode{display:flex;gap:6px}
-.cmode button{padding:0 10px;font-size:12px;min-height:38px}
-.cbtns{display:flex;gap:6px;flex-wrap:wrap;justify-content:center}
-.cbtns button{padding:0 12px;font-size:13px}
-#calDone{background:#fff!important;color:#000!important}
-.cleft,.cright{display:flex;flex-direction:column;align-items:center;gap:10px}
-@media (orientation:landscape){.cpad{flex-direction:row;gap:22px}.chint{max-width:210px}}
 /* ===================== lyrics · streaming · settings (Liquid Glass) ===================== */
 [hidden]{display:none!important}
 .artwrap{position:relative}
@@ -414,44 +321,271 @@ body.stream-dsp #sEq .eqstrip{opacity:.45}
 #toast{background:rgba(36,36,36,.84);backdrop-filter:blur(20px);-webkit-backdrop-filter:blur(20px)}
 @media (prefers-reduced-motion:reduce){.lyl,.switch,.switch::after,.dot{transition:none!important;animation:none!important}}
 
+/* ===================== Apple Music · iOS 26 Liquid Glass ===================== */
+:root{--glass:rgba(28,28,32,.56);--gline:rgba(255,255,255,.18);--ease:cubic-bezier(.32,.72,0,1);--sat:env(safe-area-inset-top,0px);--sab:env(safe-area-inset-bottom,0px);--sal:env(safe-area-inset-left,0px);--sar:env(safe-area-inset-right,0px);--o1:#fa243c;--o2:#7a3cff;--o3:#ff7a45;--o4:#2a64ff;--navH:64px;--miniH:56px}
+html,body{font-family:-apple-system,BlinkMacSystemFont,"SF Pro Display","SF Pro Text",sans-serif;background:#000;height:100vh;height:100dvh}
+#stage{height:100vh;height:100dvh;background:#0a0a0c;contain:layout paint;overflow:hidden}
+#cur,#dur,.mval,.mlim,.bv,.kval,.phead output,.mticks span,.pscale span,#preO,#grRead,#mlimTxt,#sleepLeft,.track .n,.bf,.scale .bt span,.qa{font-variant-numeric:tabular-nums}
+
+/* glass surfaces */
+#nav,#mini,#morePop,.cbtn,#menuBox,#themeBox,#modal .box,#toast,.dock button,#qSheet{background:rgba(28,28,32,.56);-webkit-backdrop-filter:blur(48px) saturate(190%);backdrop-filter:blur(48px) saturate(190%);border:.5px solid rgba(255,255,255,.18);box-shadow:inset 0 1px 0 rgba(255,255,255,.22),0 12px 32px rgba(0,0,0,.34)}
+button,select,.btn{background:rgba(255,255,255,.1);border:.5px solid rgba(255,255,255,.14);border-radius:12px;box-shadow:inset 0 1px 0 rgba(255,255,255,.16);color:#fff}
+button.on,.btn.primary{background:var(--acc);color:#fff;border-color:transparent;box-shadow:inset 0 1px 0 rgba(255,255,255,.3),0 6px 18px rgba(var(--rgb),.35)}
+button.tog.on{background:rgba(var(--rgb),.22);color:var(--acc);border-color:rgba(var(--rgb),.5);box-shadow:none}
+#ab.off{background:rgba(255,69,58,.18);color:#ff6961;border-color:rgba(255,69,58,.5)}
+button.danger{color:#ff6961}
+input[type=search],input[type=text]{background:rgba(255,255,255,.1);border:.5px solid rgba(255,255,255,.14);border-radius:12px}
+select{background-color:rgba(255,255,255,.1)}
+
+/* mesh background */
+.mesh{position:absolute;inset:0;overflow:hidden;pointer-events:none;z-index:0;contain:strict}
+.orb{position:absolute;border-radius:50%;filter:blur(90px);opacity:.78;will-change:transform}
+.orb.o1{width:78vmax;height:78vmax;left:-26vmax;top:-24vmax;background:radial-gradient(circle,var(--o1) 0,transparent 68%);animation:orb1 28s ease-in-out infinite alternate}
+.orb.o2{width:70vmax;height:70vmax;right:-28vmax;top:12vh;background:radial-gradient(circle,var(--o2) 0,transparent 68%);animation:orb2 34s ease-in-out infinite alternate}
+.orb.o3{width:74vmax;height:74vmax;left:-6vmax;bottom:-34vmax;background:radial-gradient(circle at 35% 35%,var(--o3) 0,var(--o4) 46%,transparent 70%);animation:orb3 40s ease-in-out infinite alternate}
+@keyframes orb1{to{transform:translate3d(22vmax,16vmax,0) scale(1.18)}}
+@keyframes orb2{to{transform:translate3d(-24vmax,-10vmax,0) scale(1.1)}}
+@keyframes orb3{to{transform:translate3d(18vmax,-14vmax,0) scale(1.2)}}
+.app-mesh{opacity:.5}
+.scrim{position:absolute;inset:0;background:rgba(0,0,0,.28);pointer-events:none;z-index:0}
+@media (prefers-reduced-motion:reduce){.orb{animation:none!important}}
+
+/* tab screens */
+#screens{position:absolute;inset:0;z-index:auto;padding:calc(var(--sat) + 10px) calc(var(--sar) + 14px) calc(var(--sab) + var(--navH) + var(--miniH) + 34px) calc(var(--sal) + 14px)}
+.screen{gap:10px}
+.card,header{background:none;border:0;box-shadow:none;padding:0;border-radius:0}
+#sLibrary,#sEq,#sSearch{padding:0}
+.ltitle{display:block;font-size:34px;font-weight:800;letter-spacing:-.6px;text-transform:none;margin:2px 2px 0;flex:none}
+.ltitle::before{display:none}
+#stage.short .ltitle{font-size:26px}
+.sheethead{display:flex;align-items:center;gap:10px;flex:none}
+.sheethead .ltitle{flex:1;margin:0}
+.sheethead .sgrab,#eqDone{display:none}
+.list{background:none;border:0;border-radius:0}
+.track{border-bottom:.5px solid rgba(255,255,255,.1);min-height:58px}
+.track.cur{background:none}.track.cur::before{display:none}
+.track.cur .t{color:var(--acc)}
+.track .a{color:rgba(255,255,255,.6)}
+.pills button{background:rgba(255,255,255,.08)}
+.pills button.on{background:var(--acc)}
+#sSearch #search{min-height:46px;font-size:17px}
+.stor .bar{background:rgba(255,255,255,.1);border:0}
+.stor .bar>div{background:var(--acc)}
+
+/* floating tab bar */
+#nav{position:absolute;z-index:6;left:calc(var(--sal) + 14px);right:calc(var(--sar) + 14px);bottom:calc(var(--sab) + 8px);height:var(--navH);max-width:560px;margin:0 auto;display:flex;gap:2px;padding:6px;border-radius:32px}
+#nav button{position:relative;flex:1;min-width:0;min-height:0;height:100%;flex-direction:column;gap:2px;padding:0 2px;border:0;background:transparent;box-shadow:none;border-radius:26px;color:rgba(255,255,255,.62);font-size:10px;font-weight:600;letter-spacing:0;text-transform:none;transition:background .25s,color .25s}
+#nav button svg{width:24px;height:24px}
+#nav button.act{color:var(--acc);background:rgba(255,255,255,.13);box-shadow:none}
+#stage.squat #nav button span{display:none}
+
+/* mini player */
+#mini{position:absolute;z-index:5;left:calc(var(--sal) + 14px);right:calc(var(--sar) + 14px);bottom:calc(var(--sab) + var(--navH) + 16px);height:var(--miniH);max-width:560px;margin:0 auto;border-radius:16px;display:flex;align-items:center;gap:10px;padding:0 6px 0 8px;cursor:pointer;transition:opacity .3s,transform .45s var(--ease)}
+#stage.np-open #mini{opacity:0;pointer-events:none;transform:translateY(30px)}
+#miniArt{width:40px;height:40px;border-radius:8px;flex:none;background:#2a2a2e center/cover no-repeat;display:flex;align-items:center;justify-content:center;color:rgba(255,255,255,.4)}
+.mi{flex:1;min-width:0}
+.mt{font-size:15px;font-weight:600;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.ma{font-size:13px;color:rgba(255,255,255,.6);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+#mini button{width:44px;height:44px;min-height:44px;padding:0;border:0;background:transparent;box-shadow:none;border-radius:50%;flex:none}
+#mini button svg{width:24px;height:24px;display:block}
+
+/* Now Playing sheet */
+#sPlayer{position:absolute;inset:0;z-index:40;display:flex;flex-direction:column;gap:0;background:#000;transform:translateY(100%);visibility:hidden;transition:transform .45s var(--ease),visibility 0s linear .45s;overflow:hidden;will-change:transform}
+#stage.np-open #sPlayer{transform:none;visibility:visible;transition:transform .45s var(--ease),visibility 0s}
+.np-body{position:relative;z-index:2;flex:1;min-height:0;width:100%;max-width:620px;margin:0 auto;display:flex;flex-direction:column;gap:12px;padding:calc(var(--sat) + 2px) calc(var(--sar) + 26px) calc(var(--sab) + 16px) calc(var(--sal) + 26px)}
+#grab{flex:none;align-self:stretch;height:28px;display:flex;align-items:center;justify-content:center;cursor:pointer;touch-action:none;margin:0 -26px}
+#grab i{width:36px;height:5px;border-radius:3px;background:rgba(255,255,255,.4)}
+.npbar{display:none;align-items:center;gap:12px;flex:none;padding-right:92px}
+#art2{width:48px;height:48px;border-radius:8px;flex:none;background:#2a2a2e center/cover no-repeat}
+.npbt{min-width:0}.npbt .t{font-size:17px;font-weight:700;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}.npbt .a{font-size:15px;color:rgba(255,255,255,.62);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.artwrap{flex:1 1 0;min-height:0;position:relative;display:flex;align-items:center;justify-content:center;container-type:size}
+#sPlayer #art{width:min(100cqw,100cqh);height:min(100cqw,100cqh);aspect-ratio:1/1;border-radius:14px;border:0;background:#2a2a2e center/cover no-repeat;font-size:84px;color:rgba(255,255,255,.3);display:flex;align-items:center;justify-content:center;transform:scale(1);box-shadow:0 24px 48px -12px rgba(0,0,0,.65);transition:transform 520ms cubic-bezier(.34,1.56,.64,1),box-shadow 520ms cubic-bezier(.34,1.56,.64,1)}
+#stage.paused #sPlayer #art{transform:scale(.78);box-shadow:0 10px 24px -8px rgba(0,0,0,.45)}
+.pright{flex:none;display:flex;flex-direction:column;gap:10px;min-width:0}
+.metarow{display:flex;align-items:center;gap:10px;flex:none}
+.meta{flex:1;min-width:0;display:flex;flex-direction:column;align-items:flex-start;gap:0;text-align:left}
+#sPlayer .title{font-size:22px;font-weight:700;letter-spacing:-.2px;max-width:100%;overflow:hidden;white-space:nowrap;text-overflow:clip}
+#sPlayer .title.mq span{display:inline-block;animation:mq 9s ease-in-out infinite alternate}
+@keyframes mq{0%,14%{transform:translateX(0)}86%,100%{transform:translateX(var(--mq))}}
+#sPlayer .artist{font-size:20px;font-weight:400;color:rgba(255,255,255,.62);max-width:100%;overflow:hidden;white-space:nowrap;text-overflow:ellipsis}
+#sPlayer .sub{display:none}
+.cbtn{width:36px;height:36px;min-height:36px;padding:0;border-radius:50%;flex:none;color:#fff}
+.cbtn svg{width:18px;height:18px}
+.cbtn.on{color:var(--acc);background:rgba(28,28,32,.56);border-color:rgba(255,255,255,.18);box-shadow:inset 0 1px 0 rgba(255,255,255,.22),0 12px 32px rgba(0,0,0,.34)}
+
+/* thumb-less scrubber */
+#scrub{position:relative;flex:none;height:26px;cursor:pointer;touch-action:none;outline:none;border-radius:6px}
+#scrub::before{content:'';position:absolute;left:0;right:0;top:50%;height:4px;margin-top:-2px;border-radius:99px;background:rgba(255,255,255,.24);transition:height .15s ease-out,margin-top .15s ease-out}
+#scrubFill{position:absolute;left:0;top:50%;height:4px;margin-top:-2px;width:0;border-radius:99px;background:#fff;transition:height .15s ease-out,margin-top .15s ease-out}
+#scrub.drag::before,#scrub.drag #scrubFill{height:9px;margin-top:-4.5px}
+#scrub:focus-visible{outline:2px solid #fff;outline-offset:2px}
+.timerow{display:flex;align-items:center;justify-content:space-between;gap:8px;flex:none;margin-top:-6px;font-size:12px;color:rgba(255,255,255,.6)}
+.timerow span{flex:none;min-width:44px}
+#cur{text-align:left}
+#dur{text-align:right}
+#tBadge{margin:0;padding:2px 10px;border-radius:999px;border:.5px solid rgba(255,255,255,.28);color:rgba(255,255,255,.75);background:rgba(255,255,255,.08);font-size:11px;font-weight:700;letter-spacing:.6px;white-space:nowrap;max-width:60%;overflow:hidden;text-overflow:ellipsis}
+#tBadge:empty{visibility:hidden}
+
+/* transport + volume */
+#sPlayer .transport{display:flex;justify-content:center;align-items:center;gap:34px;flex:none}
+#sPlayer .transport button{width:64px;height:64px;min-height:0;padding:0;border-radius:50%;background:transparent;border:0;box-shadow:none;color:#fff;transition:transform .32s cubic-bezier(.34,1.56,.64,1)}
+#sPlayer .transport button svg{width:34px;height:34px}
+#sPlayer .transport button.big svg{width:48px;height:48px}
+#sPlayer .transport button:active{transform:scale(.85)}
+.rvol{display:flex;align-items:center;gap:10px;flex:none;color:rgba(255,255,255,.6)}
+.rvol svg{width:18px;height:18px;flex:none}
+#vol{flex:1;height:24px;margin:0;--p:100%}
+#vol::-webkit-slider-runnable-track{height:4px;border-radius:99px;background:linear-gradient(90deg,#fff var(--p),rgba(255,255,255,.24) var(--p));box-shadow:none;transition:height .15s ease-out}
+#vol:active::-webkit-slider-runnable-track{height:8px}
+#vol::-webkit-slider-thumb{-webkit-appearance:none;width:0;height:0;border:0;background:transparent;box-shadow:none}
+#vol::-moz-range-track{height:4px;border-radius:99px;background:rgba(255,255,255,.24);transition:height .15s ease-out}
+#vol::-moz-range-progress{height:4px;border-radius:99px;background:#fff;transition:height .15s ease-out}
+#vol:active::-moz-range-track,#vol:active::-moz-range-progress{height:8px}
+#vol::-moz-range-thumb{width:0;height:0;border:0;background:transparent}
+
+/* utility dock */
+.dock{display:flex;justify-content:center;gap:12px;flex:none}
+.dock button{flex:1;max-width:150px;height:46px;min-height:0;padding:0;border-radius:23px;color:rgba(255,255,255,.78)}
+.dock button svg{width:22px;height:22px}
+.dock button.on{background:var(--acc);color:#fff;border-color:transparent}
+
+/* lyrics view: art collapses into a 48px header, 28px bold lines, progressive blur */
+#stage.lyr-on .npbar{display:flex}
+#stage.lyr-on .meta{display:none}
+#stage.lyr-on .metarow{position:absolute;top:calc(var(--sat) + 36px);right:calc(var(--sar) + 26px);z-index:3}
+#stage.lyr-on #art{display:none}
+#lyrWrap{position:absolute;inset:0;border-radius:0;background:none;border:0;box-shadow:none;-webkit-backdrop-filter:none;backdrop-filter:none}
+#lyrScroll{padding:40cqh 2px;-webkit-mask-image:linear-gradient(transparent,#000 12%,#000 82%,transparent);mask-image:linear-gradient(transparent,#000 12%,#000 82%,transparent)}
+.lyl{font-size:28px;font-weight:800;line-height:1.16;letter-spacing:-.4px;text-align:left;color:rgba(255,255,255,.42);transform-origin:left center;transition:color .3s ease,transform .3s ease,filter .3s ease;padding:7px 4px}
+.lyl.act{color:#fff;transform:scale(1.02)}
+.lyl.plain{font-size:20px;font-weight:600;filter:none!important}
+#lyrMsg{font-size:20px}
+#lyrSync{position:absolute;right:6px;bottom:10px;min-height:34px;padding:0 16px;border-radius:999px;background:rgba(28,28,32,.7);-webkit-backdrop-filter:blur(30px);backdrop-filter:blur(30px);z-index:4}
+
+/* ••• menu */
+#morePop{position:fixed;z-index:60;width:230px;padding:6px;border-radius:18px;display:flex;flex-direction:column;gap:2px}
+#morePop button{width:100%;justify-content:space-between;min-height:44px;border:0;background:transparent;box-shadow:none;border-radius:12px;font-size:15px}
+#morePop button:active{background:rgba(255,255,255,.12)}
+#sleepBtn.on{color:var(--acc)}
+
+/* Up Next sheet */
+#qSheet{position:absolute;z-index:50;left:0;right:0;bottom:0;top:calc(var(--sat) + 36px);display:flex;flex-direction:column;border-radius:26px 26px 0 0;padding:6px calc(var(--sar) + 16px) calc(var(--sab) + 12px) calc(var(--sal) + 16px);background:rgba(24,24,28,.8);transform:translateY(105%);visibility:hidden;transition:transform .45s var(--ease),visibility 0s linear .45s}
+#qSheet.show{transform:none;visibility:visible;transition:transform .45s var(--ease),visibility 0s}
+.qgrab{align-self:stretch;height:24px;display:flex;align-items:center;justify-content:center;touch-action:none}
+.qgrab i{width:36px;height:5px;border-radius:3px;background:rgba(255,255,255,.4)}
+.qhead{display:flex;align-items:center;gap:8px;flex:none}
+.qhead h2{flex:1;margin:0;font-size:24px;font-weight:800}
+.qhead button{min-height:40px;min-width:44px;padding:0 12px}
+.qhead button svg{width:20px;height:20px}
+.qnote{color:rgba(255,255,255,.55);font-size:13px;margin:6px 2px 4px;flex:none}
+#qList{flex:1;min-height:0;overflow:auto;-webkit-overflow-scrolling:touch;overscroll-behavior:contain}
+.qrow{position:relative;overflow:hidden;border-bottom:.5px solid rgba(255,255,255,.1)}
+.qrow.drag{z-index:3;overflow:visible;background:rgba(60,60,66,.92);border-radius:12px;box-shadow:0 14px 30px rgba(0,0,0,.5)}
+.qdel{position:absolute;inset:0;opacity:0;transition:opacity .15s;background:#ff453a;color:#fff;font-weight:700;display:flex;align-items:center;justify-content:flex-end;padding-right:22px}
+.qrow[data-swiped] .qdel{opacity:1}
+.qfg{position:relative;display:flex;align-items:center;gap:6px;min-height:58px;background:rgba(24,24,28,.01);touch-action:pan-y;transition:transform .15s ease-out}
+.qrow.drag .qfg{background:transparent}
+.qi{flex:1;min-width:0}
+.qt{font-size:16px;font-weight:600;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.qa{font-size:13px;color:rgba(255,255,255,.55);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.qrow.qnow .qt{color:var(--acc)}.qrow.qpast{opacity:.5}
+.qh{width:44px;height:44px;flex:none;display:flex;align-items:center;justify-content:center;color:rgba(255,255,255,.5);touch-action:none;cursor:grab}
+.qh svg{width:22px;height:22px}
+.qx{width:40px;min-height:40px;height:40px;padding:0;border:0;background:transparent;box-shadow:none;color:rgba(255,255,255,.45)}
+@media (hover:none){.qx{display:none}}
+
+/* EQ & DSP: tab + sheet */
+#sEq{position:relative}
+.panel{background:none}
+.viz{background:rgba(0,0,0,.35);border:.5px solid rgba(255,255,255,.12);border-radius:14px;box-shadow:none}
+.meter{background:rgba(0,0,0,.4);border:.5px solid rgba(255,255,255,.1);border-radius:5px}
+.bands{background:rgba(0,0,0,.28);border:.5px solid rgba(255,255,255,.1);border-radius:16px;box-shadow:none}
+.tone{background:rgba(0,0,0,.28);border:.5px solid rgba(255,255,255,.1);border-radius:16px;box-shadow:none}
+.kgrid .kn{background:rgba(255,255,255,.06);border:.5px solid rgba(255,255,255,.1);border-radius:16px}
+.pill{background:rgba(0,0,0,.4);border:.5px solid rgba(255,255,255,.12);box-shadow:none}
+.pill .pthumb{background:#fff;border:0;box-shadow:0 2px 8px rgba(0,0,0,.5)}.pill .pthumb::after{display:none}
+.pill .pfill{background:var(--acc);box-shadow:none}
+.bt .thumb{background:#fff;border:0;border-radius:6px;box-shadow:0 2px 8px rgba(0,0,0,.5)}.bt .thumb::after{background:var(--acc);box-shadow:none}
+.bt .fill{background:var(--acc);box-shadow:none}
+.bt .rail{background:rgba(0,0,0,.45);border:.5px solid rgba(255,255,255,.1)}
+.grline{display:flex;align-items:center;gap:8px;flex:none;font-size:12px;color:rgba(255,255,255,.65)}
+.grline .sp{flex:1}
+.grline output,.grline #mlimTxt{font-weight:700;color:var(--acc);min-width:56px}
+.dsp-badge{display:none;position:absolute;left:50%;top:46%;transform:translate(-50%,-50%);z-index:8;margin:0;pointer-events:none;padding:11px 20px;border-radius:999px;font-size:13px;font-weight:700;letter-spacing:0;color:#fff;text-align:center;width:max-content;max-width:92%;background:rgba(28,28,32,.7);-webkit-backdrop-filter:blur(40px) saturate(190%);backdrop-filter:blur(40px) saturate(190%);border:.5px solid rgba(255,255,255,.22);box-shadow:inset 0 1px 0 rgba(255,255,255,.25),0 14px 34px rgba(0,0,0,.45)}
+body.stream-dsp .dsp-badge{display:block}
+body.stream-dsp #sEq .panel{opacity:.38;filter:grayscale(.6);pointer-events:none}
+#stage.eq-sheet #sEq{display:flex;position:absolute;z-index:45;left:0;right:0;bottom:0;top:calc(var(--sat) + 28px);padding:8px calc(var(--sar) + 14px) calc(var(--sab) + 12px) calc(var(--sal) + 14px);border-radius:26px 26px 0 0;background:rgba(24,24,28,.8);-webkit-backdrop-filter:blur(48px) saturate(190%);backdrop-filter:blur(48px) saturate(190%);border:.5px solid rgba(255,255,255,.18);box-shadow:0 -10px 40px rgba(0,0,0,.45);transform:translateY(105%);transition:transform .45s var(--ease);overflow:auto}
+#stage.eq-sheet.eq-in #sEq{transform:none}
+#stage.eq-sheet .sheethead{position:relative;padding-top:14px}
+#stage.eq-sheet .sheethead .sgrab{display:block;position:absolute;top:2px;left:50%;margin-left:-18px;height:5px;width:36px;border-radius:3px;background:rgba(255,255,255,.4)}
+#stage.eq-sheet #eqDone{display:inline-flex}
+#stage.eq-sheet .sheethead .ltitle{font-size:26px}
+
+/* settings drawer, modals, toast */
+#menuWrap{z-index:70;background:rgba(0,0,0,.45)}
+#themeWrap{z-index:75}#modal{z-index:80;background:rgba(0,0,0,.5)}
+#toast{z-index:90;bottom:calc(var(--sab) + var(--navH) + var(--miniH) + 28px);color:#fff;border-radius:999px;padding:10px 18px}
+#menuBox{padding-top:calc(var(--sat) + 14px);padding-bottom:calc(var(--sab) + 14px);background:rgba(24,24,28,.78)}
+.msec .lab,.lab{color:rgba(255,255,255,.55)}
+.mrow{border-radius:14px}
+
+/* landscape on short screens: artwork left, controls right */
+@media (orientation:landscape) and (max-height:560px){
+  .np-body{max-width:none;display:grid;grid-template-columns:minmax(0,.85fr) minmax(0,1.15fr);grid-template-rows:auto auto minmax(0,1fr);gap:4px 28px}
+  #grab{grid-column:1/-1}.npbar{grid-column:1/-1}
+  .artwrap{grid-column:1;grid-row:3}.pright{grid-column:2;grid-row:3;justify-content:center;gap:6px}
+  #sPlayer .transport button{width:50px;height:50px}.dock button{height:38px}
+  #sPlayer .title{font-size:19px}#sPlayer .artist{font-size:16px}
+  #stage.lyr-on .artwrap{grid-column:1/-1}#stage.lyr-on .pright{display:none}
+}
 </style>
 </head>
 <body>
 <div id="stage">
-<div id="ambWrap"><div id="ambient"></div></div><div id="ambShade"></div>
+<div class="mesh app-mesh" aria-hidden="true"><i class="orb o1"></i><i class="orb o2"></i><i class="orb o3"></i></div><div class="scrim" aria-hidden="true"></div><div id="ambient" hidden></div>
 <div id="screens">
 
-<section class="screen" id="sPlayer">
-  <div class="artwrap"><div id="art">♪</div><div id="lyrWrap" class="glass" hidden><div id="lyrScroll"><div id="lyrInner"></div></div><div id="lyrMsg" hidden></div></div></div>
-  <div class="pright">
-    <div class="meta">
-      <div class="title" id="tTitle">No track loaded</div>
-      <div class="artist" id="tArtist">&nbsp;</div>
-      <div class="sub" id="tSub">Open Library to add your MP3s</div>
-      <div id="tBadge"></div>
-    </div>
-    <div class="seekrow"><span id="cur">0:00</span><canvas id="wave" aria-label="Seek"></canvas><span id="dur">0:00</span><input type="range" id="seek" min="0" max="1000" value="0" aria-label="Seek"></div>
-    <div class="transport">
-      <button id="shuf" class="tog" title="Shuffle" aria-label="Shuffle"></button>
-      <button id="prev" aria-label="Previous"></button>
-      <button id="play" class="big" aria-label="Play or pause"></button>
-      <button id="next" aria-label="Next"></button>
-      <button id="rep" class="tog" title="Repeat" aria-label="Repeat"></button>
-    </div>
-    <div class="tsub">
-      <button id="catPrev" title="Previous album" aria-label="Previous category"><svg class="s" viewBox="0 0 24 24"><path d="M9 7l-5 5 5 5M15 7l-5 5 5 5M21 7l-5 5 5 5"/></svg></button>
-      <button id="sleepBtn" title="Sleep timer" aria-label="Sleep timer"><svg class="s" viewBox="0 0 24 24"><path d="M21 12.8A9 9 0 1 1 11.2 3a7 7 0 0 0 9.8 9.8z"/></svg><span id="sleepLeft"></span></button>
-      <button id="catNext" title="Next album" aria-label="Next category"><svg class="s" viewBox="0 0 24 24"><path d="M3 7l5 5-5 5M9 7l5 5-5 5M15 7l5 5-5 5"/></svg></button>
-      <button id="lyrBtn" hidden title="Lyrics" aria-label="Lyrics"><svg class="s" viewBox="0 0 24 24"><path d="M4 5h16v11H9l-5 4z"/></svg></button>
-    </div>
-    <div class="row rvol">
-      <span class="lab">Vol</span>
-      <input type="range" id="vol" min="0" max="1" step="0.01" value="1" style="flex:1" aria-label="Volume">
+<section class="screen" id="sPlayer" aria-label="Now Playing" aria-hidden="true">
+  <div class="mesh" aria-hidden="true"><i class="orb o1"></i><i class="orb o2"></i><i class="orb o3"></i></div>
+  <div class="scrim" aria-hidden="true"></div>
+  <div class="np-body">
+    <div id="grab" role="button" tabindex="0" aria-label="Collapse Now Playing"><i></i></div>
+    <div class="npbar"><div id="art2"></div><div class="npbt"><div class="t" id="tTitle2"></div><div class="a" id="tArtist2"></div></div></div>
+    <div class="artwrap"><div id="art">♪</div><div id="lyrWrap" class="glass" hidden><div id="lyrScroll"><div id="lyrInner"></div></div><div id="lyrMsg" hidden></div><button id="lyrSync" hidden>Sync</button></div></div>
+    <div class="pright">
+      <div class="metarow">
+        <div class="meta">
+          <div class="title" id="tTitle">No track loaded</div>
+          <div class="artist" id="tArtist">&nbsp;</div>
+          <div class="sub" id="tSub">Open Library to add your MP3s</div>
+        </div>
+        <button id="favBtn" class="cbtn" aria-label="Favorite" aria-pressed="false"><svg class="s" viewBox="0 0 24 24"><path d="M12 20.5s-7.5-4.6-9.2-9.3C1.6 7.9 3.6 5 6.6 5c1.9 0 3.5 1 5.4 3 1.9-2 3.5-3 5.4-3 3 0 5 2.900 3.800 6.200C19.500 15.900 12 20.500 12 20.500z"/></svg></button>
+        <button id="moreBtn" class="cbtn" aria-label="More" aria-haspopup="menu" aria-expanded="false"><svg class="f" viewBox="0 0 24 24"><circle cx="5.500" cy="12" r="1.800"/><circle cx="12" cy="12" r="1.800"/><circle cx="18.500" cy="12" r="1.800"/></svg></button>
+      </div>
+      <div id="scrub" role="slider" tabindex="0" aria-label="Seek" aria-valuemin="0" aria-valuemax="0" aria-valuenow="0" aria-valuetext="0:00"><i id="scrubFill"></i></div>
+      <input type="range" id="seek" min="0" max="1000" value="0" aria-label="Seek position" tabindex="-1" hidden>
+      <div class="timerow"><span id="cur">0:00</span><div id="tBadge"></div><span id="dur">0:00</span></div>
+      <div class="transport">
+        <button id="prev" aria-label="Previous"></button>
+        <button id="play" class="big" aria-label="Play or pause"></button>
+        <button id="next" aria-label="Next"></button>
+      </div>
+      <div class="rvol">
+        <svg class="s" viewBox="0 0 24 24" aria-hidden="true"><path d="M4 9.500v5h3.500l5 4v-13l-5 4z"/></svg>
+        <input type="range" id="vol" min="0" max="1" step="0.01" value="1" aria-label="Volume">
+        <svg class="s" viewBox="0 0 24 24" aria-hidden="true"><path d="M4 9.500v5h3.500l5 4v-13l-5 4z"/><path d="M16 8.500a5 5 0 0 1 0 7M18.500 6a8.500 8.500 0 0 1 0 12"/></svg>
+      </div>
+      <div class="dock">
+        <button id="lyrBtn" aria-label="Lyrics" aria-pressed="false"><svg class="s" viewBox="0 0 24 24"><path d="M4 5.500h16v11H10l-4.500 3.500v-3.500H4z"/><path d="M8 9.500h8M8 12.500h5"/></svg></button>
+        <button id="eqBtn" aria-label="Audio and EQ"><svg class="s" viewBox="0 0 24 24"><line x1="6" y1="4" x2="6" y2="20"/><line x1="12" y1="4" x2="12" y2="20"/><line x1="18" y1="4" x2="18" y2="20"/><circle cx="6" cy="9" r="2.300" fill="currentColor"/><circle cx="12" cy="15" r="2.300" fill="currentColor"/><circle cx="18" cy="8" r="2.300" fill="currentColor"/></svg></button>
+        <button id="qBtn" aria-label="Up Next"><svg class="s" viewBox="0 0 24 24"><path d="M9 6h11M9 12h11M9 18h11"/><circle cx="4.500" cy="6" r="1.100" fill="currentColor"/><circle cx="4.500" cy="12" r="1.100" fill="currentColor"/><circle cx="4.500" cy="18" r="1.100" fill="currentColor"/></svg></button>
+      </div>
     </div>
   </div>
 </section>
 
 <section class="screen card" id="sLibrary">
+  <h1 class="ltitle">Library</h1>
   <div class="row">
     <div class="pills" id="libTabs"><button data-lt="songs" class="on">All Songs</button><button data-lt="albums">Albums</button><button data-lt="artists">Artists</button></div>
     <label class="btn primary" for="files" id="addLbl">＋ Add MP3s</label>
@@ -466,7 +600,8 @@ body.stream-dsp #sEq .eqstrip{opacity:.45}
 </section>
 
 <section class="screen card" id="sEq">
-  <div class="dsp-badge" role="status">DSP Bypassed (DRM stream): EQ, preamp, reverb and meters do not affect this track</div>
+  <div class="sheethead"><i class="sgrab" aria-hidden="true"></i><h1 class="ltitle">EQ &amp; DSP</h1><button id="eqDone" class="on">Done</button></div>
+  <div class="dsp-badge" role="status">DSP &amp; Meters Bypassed (DRM Stream)</div>
   <div class="eqstrip">
     <button id="ab" class="on" title="Switch the EQ on/off to compare">EQ ON</button>
     <select id="preset" aria-label="Preset"></select>
@@ -491,6 +626,7 @@ body.stream-dsp #sEq .eqstrip{opacity:.45}
       <span class="mlim" id="mlim"></span>
       <button id="clip" class="clipbtn" title="Lights when the signal goes over 0 dB. Tap to clear.">CLIP</button>
     </div>
+    <div class="grline"><span class="lab">Limiter</span><span id="mlimTxt"></span><span class="sp"></span><span class="lab">Headroom GR</span><output id="grRead" aria-label="Auto-headroom gain reduction (read only)">0.0 dB</output></div>
     <div class="bands" id="bands"></div>
   </div>
 
@@ -521,6 +657,7 @@ body.stream-dsp #sEq .eqstrip{opacity:.45}
 </section>
 
 <section class="screen card" id="sSearch">
+  <h1 class="ltitle">Search</h1>
   <div class="row"><input type="search" id="search" placeholder="Search songs, artists, albums" autocomplete="off" autocorrect="off" autocapitalize="off"></div>
   <div class="list" id="slist"><div class="empty">Type to search your library</div></div>
 </section>
@@ -528,19 +665,27 @@ body.stream-dsp #sEq .eqstrip{opacity:.45}
 </div>
 
 <nav id="nav" aria-label="Main">
-  <button data-t="player" class="act"><svg class="s" viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><path d="M10 8.5v7l5.5-3.5z" fill="currentColor"/></svg><span>Player</span></button>
-  <button data-t="library"><svg class="s" viewBox="0 0 24 24"><rect x="4" y="4" width="6.5" height="6.5" rx="1.5"/><rect x="13.5" y="4" width="6.5" height="6.5" rx="1.5"/><rect x="4" y="13.5" width="6.5" height="6.5" rx="1.5"/><rect x="13.5" y="13.5" width="6.5" height="6.5" rx="1.5"/></svg><span>Library</span></button>
-  <button data-t="eq"><svg class="s" viewBox="0 0 24 24"><line x1="6" y1="4" x2="6" y2="20"/><line x1="12" y1="4" x2="12" y2="20"/><line x1="18" y1="4" x2="18" y2="20"/><circle cx="6" cy="9" r="2.3" fill="currentColor"/><circle cx="12" cy="15" r="2.3" fill="currentColor"/><circle cx="18" cy="8" r="2.3" fill="currentColor"/></svg><span>Equalizer</span></button>
-  <button data-t="search"><svg class="s" viewBox="0 0 24 24"><circle cx="10.5" cy="10.5" r="6.5"/><line x1="15.5" y1="15.5" x2="21" y2="21"/></svg><span>Search</span></button>
+  <button data-t="library" class="act"><svg class="s" viewBox="0 0 24 24"><path d="M9 18V6l10-2v12"/><circle cx="6.500" cy="18" r="2.500"/><circle cx="16.500" cy="16" r="2.500"/></svg><span>Library</span></button>
+  <button data-t="eq"><svg class="s" viewBox="0 0 24 24"><line x1="6" y1="4" x2="6" y2="20"/><line x1="12" y1="4" x2="12" y2="20"/><line x1="18" y1="4" x2="18" y2="20"/><circle cx="6" cy="9" r="2.300" fill="currentColor"/><circle cx="12" cy="15" r="2.300" fill="currentColor"/><circle cx="18" cy="8" r="2.300" fill="currentColor"/></svg><span>EQ &amp; DSP</span></button>
+  <button data-t="search"><svg class="s" viewBox="0 0 24 24"><circle cx="10.500" cy="10.500" r="6.500"/><line x1="15.500" y1="15.500" x2="21" y2="21"/></svg><span>Search</span></button>
   <button data-t="menu"><svg class="s" viewBox="0 0 24 24"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg><span>Settings</span><i class="dot" id="setDot" hidden></i></button>
 </nav>
+<div id="mini" role="button" tabindex="0" aria-label="Open Now Playing"><div id="miniArt"></div><div class="mi"><div class="mt" id="miniT">Not playing</div><div class="ma" id="miniA">&nbsp;</div></div><button id="miniPlay" aria-label="Play or pause"></button><button id="miniNext" aria-label="Next"></button></div>
+<div id="qSheet" role="dialog" aria-modal="true" aria-label="Up Next" aria-hidden="true">
+  <div class="qgrab" id="qGrab" aria-hidden="true"><i></i></div>
+  <div class="qhead"><h2>Up Next</h2><button id="shuf" class="tog" aria-label="Shuffle"></button><button id="rep" class="tog" aria-label="Repeat"></button><button id="qDone" class="on">Done</button></div>
+  <div class="qnote" id="qNote"></div>
+  <div id="qList"></div>
+</div>
+<div id="morePop" role="menu" aria-label="More" hidden>
+  <button id="sleepBtn" role="menuitem">Sleep timer <span id="sleepLeft"></span></button>
+  <button id="catPrev" role="menuitem">Previous album</button>
+  <button id="catNext" role="menuitem">Next album</button>
+  <button id="rmCur" role="menuitem" class="danger">Remove from library</button>
+</div>
 
 <div id="menuWrap"><div id="menuBox">
   <h2>Settings <button id="menuDone" class="on" style="min-height:36px">Done</button></h2>
-  <div class="msec"><span class="lab">Screen &amp; Device Calibration</span>
-    <button class="mrow" id="menuDev"><span>Device screen</span><small id="menuDevS"></small></button>
-    <button class="mrow" id="menuCal"><span>Screen Calibration</span><small>Black-box calibrator</small></button>
-  </div>
   <div class="msec"><span class="lab">Accent Color Theme</span>
     <button class="mrow" id="themeBtn"><span>Colour theme</span><i class="swdot"></i></button>
   </div>
@@ -598,40 +743,15 @@ body.stream-dsp #sEq .eqstrip{opacity:.45}
   <div class="spec" id="specS"><div class="sthumb"></div></div>
   <div class="tprev"></div>
   <div class="swrow" id="swatches"></div>
-  <button id="themeReset">Reset to amber</button>
+  <button id="themeReset">Reset to Apple Music red</button>
 </div></div>
-<div id="modal"><div class="box">
-  <h2 id="mTitle"></h2><p id="mText"></p>
+<div id="modal" role="dialog" aria-modal="true" aria-labelledby="mTitle"><div class="box">
   <input type="text" id="mInput" maxlength="30" autocomplete="off">
   <div class="btns"><button id="mCancel">Cancel</button><button id="mOk" class="on">OK</button></div>
 </div></div>
 <div id="toast"></div>
 </div>
 
-<div id="devWrap" role="dialog" aria-modal="true" aria-labelledby="devTitle"><div id="devBox">
-  <h2 id="devTitle">Set up your screen</h2>
-  <p>Pick your device so the player fits your screen exactly, in portrait and landscape.</p>
-  <label class="lab" for="devBrand">Brand</label>
-  <select id="devBrand"></select>
-  <label class="lab" for="devModel">Model name</label>
-  <select id="devModel"></select>
-  <div id="devInfo"></div>
-  <div class="notdev">Not your device? Click <b id="devHere" role="button" tabindex="0">here</b></div>
-  <div id="devCur"></div>
-  <div class="btns"><button id="devCancel">Cancel</button><button id="devApply" class="on">Apply &amp; Save</button></div>
-</div></div>
-
-<div id="calWrap" aria-label="Screen calibration"><div id="calBox"><div class="cpad">
-  <div class="cleft">
-    <div class="cread" id="calRead">0 × 0</div>
-    <div class="chint">Press the arrows until this black box covers the white screen completely, then lock the size.</div>
-    <div class="cmode"><button id="calOut" class="sel">Expand Outward</button><button id="calIn">Shrink Inward</button></div>
-  </div>
-  <div class="cright">
-    <div class="cdpad"><button class="u" data-e="U" aria-label="Move top edge">↑</button><button class="l" data-e="L" aria-label="Move left edge">←</button><i>EDGE</i><button class="r" data-e="R" aria-label="Move right edge">→</button><button class="d" data-e="D" aria-label="Move bottom edge">↓</button></div>
-    <div class="cbtns"><button id="calDone">Done / Lock Screen Size</button><button id="calReset">Reset</button><button id="calCancel">Cancel</button></div>
-  </div>
-</div></div></div>
 
 <script src="config.js"></script>
 <script src="lyrics/engine.js"></script>
@@ -772,18 +892,21 @@ const NPTS=160;
 const freqs=new Float32Array(NPTS), mag=new Float32Array(NPTS), ph=new Float32Array(NPTS), curve=new Float32Array(NPTS);
 for(let i=0;i<NPTS;i++) freqs[i]=20*Math.pow(1000,i/(NPTS-1));
 
+let grDb=0;
 function recompute(){
   curve.fill(0);
   allShadow.forEach(sh=>{
     sh.getFrequencyResponse(freqs,mag,ph);
     for(let k=0;k<NPTS;k++) curve[k]+=20*Math.log10(Math.max(mag[k],1e-6));
   });
+  // Auto-Headroom is separate from the manual preamp: it only adds its own attenuation (grDb, shown as GR),
+  // and never moves the user's preamp slider.
+  grDb=0;
   if(state.auto){
-    // compensate part of the boost so boosts stay audible; the limiter catches the rest
     let peak=0; for(let k=0;k<NPTS;k++) if(curve[k]>peak) peak=curve[k];
-    state.pre=0-Math.round(Math.min(15,peak*0.55)*10)/10;
+    grDb=Math.round(Math.min(15,Math.max(0,peak)*0.55)*10)/10;
   }
-  preNode.gain.setTargetAtTime(Math.pow(10,state.pre/20),ac.currentTime,0.03);
+  preNode.gain.setTargetAtTime(Math.pow(10,(state.pre-grDb)/20),ac.currentTime,0.03);
 }
 let applying=false;
 function update(){
@@ -853,7 +976,6 @@ const pill=$('#pre'), pFill=pill.querySelector('.pfill'), pThumb=pill.querySelec
   };
   pill.addEventListener('pointerdown',e=>{
     e.preventDefault();
-    if(state.auto){ toast('Headroom sets the preamp for you. Tap Headroom to turn it off.',2800); return; }
     const now=performance.now();
     if(now-last<320){ last=0; state.pre=0; update(); return; } // double-tap = reset preamp
     last=now; drag=true; pill.classList.add('drag'); try{pill.setPointerCapture(e.pointerId);}catch(_){}
@@ -863,7 +985,6 @@ const pill=$('#pre'), pFill=pill.querySelector('.pfill'), pThumb=pill.querySelec
   const end=()=>{ drag=false; pill.classList.remove('drag'); };
   pill.addEventListener('pointerup',end); pill.addEventListener('pointercancel',end); pill.addEventListener('lostpointercapture',end);
   pill.addEventListener('keydown',e=>{
-    if(state.auto) return;
     const d=e.key==='ArrowUp'||e.key==='ArrowRight'?0.5:e.key==='ArrowDown'||e.key==='ArrowLeft'?-0.5:0;
     if(e.key==='Home'||e.key==='0'){ state.pre=0; update(); e.preventDefault(); }
     else if(d){ state.pre=clamp(Math.round((state.pre+d)*10)/10,PMIN,PMAX); update(); e.preventDefault(); }
@@ -936,8 +1057,9 @@ function syncUI(){
   pFill.style.left='calc('+(PW/2)+'px + (100% - '+PW+'px) * '+lo.toFixed(4)+')';
   pFill.style.width='calc((100% - '+PW+'px) * '+(hi-lo).toFixed(4)+')';
   pZero.style.left='calc('+(PW/2)+'px + (100% - '+PW+'px) * '+z.toFixed(4)+')';
-  pill.classList.toggle('dis',state.auto); pill.setAttribute('aria-valuenow',state.pre);
-  $('#preO').textContent=(state.auto?'AUTO  ':'')+(state.pre>0?'+':'')+state.pre.toFixed(1)+' dB';
+  pill.setAttribute('aria-valuenow',state.pre); pill.setAttribute('aria-valuetext',state.pre.toFixed(1)+' dB');
+  $('#preO').textContent=(state.pre>0?'+':'')+state.pre.toFixed(1)+' dB';
+  $('#grRead').textContent=state.auto?(grDb>0?'−'+grDb.toFixed(1):'0.0')+' dB':'off';
   $('#tone').classList.toggle('byp',state.bypass);
   syncBass(); syncTreble();
   abBtn.textContent=state.bypass?'EQ OFF':'EQ ON';
@@ -1010,6 +1132,7 @@ delBtn.onclick=()=>{
 const modal=$('#modal'),mInput=$('#mInput'),mOk=$('#mOk');
 let mHandler=null,mNeedsText=false;
 function showModal({title,text='',input=false,value='',ok='OK',danger=false,onOk}){
+  if(!$('#mTitle')){ const h=document.createElement('h2'); h.id='mTitle'; const p=document.createElement('p'); p.id='mText'; const bx=modal.querySelector('.box'); bx.prepend(p); bx.prepend(h); }
   $('#mTitle').textContent=title; $('#mText').textContent=text; $('#mText').style.display=text?'':'none';
   mInput.style.display=input?'':'none'; mInput.value=value; mNeedsText=input;
   mOk.textContent=ok; mOk.className=danger?'danger':'on'; mHandler=onOk;
@@ -1030,232 +1153,40 @@ function toast(msg,ms){
   clearTimeout(toastTimer); toastTimer=setTimeout(()=>t.classList.remove('show'),ms||2600);
 }
 
-/* ---------- device frame ----------
-   The app is laid out on a canvas of exactly the chosen / calibrated device size (portrait or landscape).
-   Short side < 600px => phone profile; landscape >= 900px wide => split view (player + tab). It is never enlarged; it is only shrunk
-   if the window is smaller, and centred otherwise. */
-let scale=1,pickerOpen=false,fitTimer=null,pickerGuard=null;
+/* ---------- responsive layout ----------
+   No device picker or calibration: the layout follows the real viewport (100dvh + safe-area insets in CSS).
+   This only toggles size classes that the EQ / meter CSS uses. */
+let scale=1;
 const stage=$('#stage');
 const typing=()=>{const a=document.activeElement;return !!a&&(a.tagName==='INPUT'&&a.type!=='range'&&a.type!=='file');};
 function fit(){
   const de=document.documentElement;
   const vw=de.clientWidth||window.innerWidth, vh=de.clientHeight||window.innerHeight;
-  if(vw<300||vh<300) return; // transient size while a system sheet is open
-  const portrait=vh>vw;
-  const P=screenProf||{pw:Math.min(vw,vh),ph:Math.max(vw,vh)};   // no saved profile yet: follow the real window
-  const w=portrait?P.pw:P.ph, h=portrait?P.ph:P.pw;             // exact device size in this orientation
-  const phone=Math.min(P.pw,P.ph)<600;
-  stage.style.width=w+'px'; stage.style.height=h+'px';
-  const cl=stage.classList;
+  if(vw<200||vh<200) return;
+  const cl=stage.classList, portrait=vh>=vw, phone=Math.min(vw,vh)<600;
   cl.toggle('portrait',portrait); cl.toggle('landscape',!portrait);
   cl.toggle('phone',phone); cl.toggle('tablet',!phone);
-  cl.toggle('wide',!phone&&!portrait&&w>=900);
-  cl.toggle('short',h<700); cl.toggle('tiny',w<340); cl.toggle('squat',h<340);
-  scale=Math.min(1,vw/w,vh/h);
-  stage.style.left=Math.round((vw-w*scale)/2)+'px';
-  stage.style.top=Math.round((vh-h*scale)/2)+'px';
-  stage.style.transform=scale===1?'none':'scale('+scale+')';
+  cl.toggle('short',vh<700); cl.toggle('tiny',vw<340); cl.toggle('squat',vh<340);
   sizeViz();
 }
-function safeFit(){ if(pickerOpen||typing()) return; clearTimeout(fitTimer); fitTimer=setTimeout(fit,150); }
+let fitTimer=null;
+function safeFit(){ if(typing()) return; clearTimeout(fitTimer); fitTimer=setTimeout(fit,120); }
 window.addEventListener('resize',safeFit);
 if(window.visualViewport) window.visualViewport.addEventListener('resize',safeFit);
-document.addEventListener('focusout',()=>setTimeout(safeFit,300));
-window.addEventListener('orientationchange',()=>{pickerOpen=false;setTimeout(fit,100);setTimeout(fit,500);});
-window.addEventListener('load',()=>{setTimeout(fit,100);setTimeout(fit,500);setTimeout(fit,1500);});
-// The file picker briefly changes the window size: ignore that, then re-fit once it closes.
-function pickerStart(){
-  pickerOpen=true; clearTimeout(pickerGuard);
-  pickerGuard=setTimeout(pickerEnd,20000);
-}
-function pickerEnd(){
-  clearTimeout(pickerGuard);
-  setTimeout(()=>{pickerOpen=false;fit();setTimeout(fit,500);},600);
-}
-window.addEventListener('focus',()=>{ if(pickerOpen) pickerEnd(); });
-document.addEventListener('visibilitychange',()=>{ if(!document.hidden&&pickerOpen) pickerEnd(); });
-
-/* ---------- device profile: Brand / Model dictionary, setup modal, calibrator ---------- */
-/* [label, portraitWidth, portraitHeight] — CSS px. Landscape swaps the two. */
-const DEVICES={
- 'Apple':[
-  ['iPhone SE (1st gen)',320,568],
-  ['iPhone SE (2nd/3rd gen) / 6 / 7 / 8',375,667],
-  ['iPhone X / XS / 11 Pro / 12 mini / 13 mini',375,812],
-  ['iPhone XR / XS Max / 11 / 11 Pro Max',414,896],
-  ['iPhone 12 / 12 Pro / 13 / 13 Pro / 14 / 16e / 17e',390,844],
-  ['iPhone 12 Pro Max / 13 Pro Max / 14 Plus',428,926],
-  ['iPhone 14 Pro / 15 / 15 Pro / 16',393,852],
-  ['iPhone 14 Pro Max / 15 Plus / 15 Pro Max / 16 Plus',430,932],
-  ['iPhone Air',420,912],
-  ['iPhone 16 Pro / 17 / 17 Pro / 18 Pro',402,874],
-  ['iPhone 16 Pro Max / 17 Pro Max / 18 Pro Max',440,956],
-  ['iPad mini (1st–5th gen) / iPad 9.7"',768,1024],
-  ['iPad mini (6th gen / A17 Pro)',744,1133],
-  ['iPad (7th–9th gen 10.2")',810,1080],
-  ['iPad (10th gen / A16) / iPad Air 11"',820,1180],
-  ['iPad Pro 11" (2018–2022)',834,1194],
-  ['iPad Pro 11" (M4/M5)',834,1210],
-  ['iPad Air 13" / iPad Pro 12.9"',1024,1366],
-  ['iPad Pro 13" (M4/M5)',1032,1376]],
- 'Samsung':[
-  ['Galaxy S20 / S21 / S21+ / S21 Ultra / A12',360,800],
-  ['Galaxy S22 / S23 / S24 / S25 / S26',360,780],
-  ['Galaxy S24+ / S24 Ultra / S25+ / S25 Ultra',384,832],
-  ['Galaxy S26 Ultra / Note 20 / A51 / A71',412,915],
-  ['Galaxy Z Flip3 / Z Flip8',360,840],
-  ['Galaxy Z Fold6 Cover',323,792],
-  ['Galaxy Z Fold6 Unfolded',619,720],
-  ['Galaxy Z Fold8 Cover',416,657],
-  ['Galaxy Z Fold8 Unfolded',924,1224],
-  ['Galaxy Tab S7 / S8',800,1280]],
- 'Google':[
-  ['Pixel 7 / 8 / 8a',412,915],
-  ['Pixel 9 / 9a / 10 / 11',412,924],
-  ['Pixel 9 Pro / 10 Pro / 11 Pro',410,914],
-  ['Pixel 9 Pro XL / 10 Pro XL / 11 Pro XL',448,997],
-  ['Pixel 10 Pro Fold Cover',412,901],
-  ['Pixel 10 Pro Fold Unfolded',755,783],
-  ['Pixel Tablet',834,1112]],
- 'OnePlus':[
-  ['OnePlus 7 / 7 Pro',412,892],
-  ['OnePlus 8 / 8T / Nord',412,915],
-  ['OnePlus 8 Pro / 10 Pro / 12 / 13',412,919]],
- 'Xiaomi & Redmi':[
-  ['Xiaomi 12 / Mi 11i',360,800],
-  ['Xiaomi 13 / 14 / 15',393,851],
-  ['Xiaomi 15 Pro',404,904],
-  ['Xiaomi 17 / 17 Ultra',427,924],
-  ['Redmi Note 8 / 9 Pro / 13 / 14 / 17',393,873]],
- 'Huawei':[
-  ['Huawei P30 Pro / Mate 20 Pro',360,780],
-  ['Huawei Mate 70 Pro',411,885]],
- 'Motorola':[
-  ['Motorola Razr 70 Ultra',412,915]],
- 'Sony':[
-  ['Sony Xperia 1',411,960]],
- 'Generic':[
-  ['Generic Compact Android',360,800],
-  ['Generic Large Android',412,915]]
-};
-let screenProf=(function(){
-  const p=ls.get('eqp-screen',null);
-  if(!p||!(+p.pw>=200)||!(+p.ph>=200)) return null;
-  const a=Math.round(+p.pw), b=Math.round(+p.ph);
-  return {brand:String(p.brand||'Custom'),model:String(p.model||''),pw:Math.min(a,b),ph:Math.max(a,b),custom:!!p.custom};
-})();
-const devWrap=$('#devWrap'), devBrand=$('#devBrand'), devModel=$('#devModel'), devInfo=$('#devInfo');
-function guessDevice(){
-  const de=document.documentElement, a=Math.min(de.clientWidth,de.clientHeight), b=Math.max(de.clientWidth,de.clientHeight);
-  let best=['Apple',0], bd=1e9;
-  Object.keys(DEVICES).forEach(br=>DEVICES[br].forEach((m,i)=>{ const d=Math.abs(m[1]-a)+Math.abs(m[2]-b); if(d<bd){ bd=d; best=[br,i]; } }));
-  return best;
-}
-function fillModels(brand,idx){
-  devModel.innerHTML='';
-  DEVICES[brand].forEach((m,i)=>devModel.appendChild(new Option(m[0],String(i))));
-  devModel.value=String(idx||0); showDevInfo();
-}
-function showDevInfo(){
-  const m=DEVICES[devBrand.value][+devModel.value]; if(!m) return;
-  devInfo.innerHTML='<b>'+m[1]+' × '+m[2]+'</b> portrait &nbsp;·&nbsp; <b>'+m[2]+' × '+m[1]+'</b> landscape<br><span style="color:var(--mut)">'+(Math.min(m[1],m[2])<600?'Phone layout':'Tablet layout')+'</span>';
-}
-function openDev(){
-  let b,i; const s=screenProf;
-  if(s&&!s.custom&&DEVICES[s.brand]&&DEVICES[s.brand].some(m=>m[0]===s.model)){ b=s.brand; i=DEVICES[b].findIndex(m=>m[0]===s.model); }
-  else { const g=guessDevice(); b=g[0]; i=g[1]; }
-  devBrand.innerHTML=''; Object.keys(DEVICES).forEach(k=>devBrand.appendChild(new Option(k,k))); devBrand.value=b;
-  fillModels(b,i);
-  $('#devCur').textContent=s?('Current: '+(s.custom?'custom calibration':s.model)+' — '+s.pw+' × '+s.ph):'No screen saved yet.';
-  $('#devCancel').textContent=s?'Cancel':'Skip';
-  devWrap.classList.add('show');
-}
-function closeDev(){ devWrap.classList.remove('show'); }
-devBrand.onchange=()=>fillModels(devBrand.value,0);
-devModel.onchange=showDevInfo;
-$('#devCancel').onclick=closeDev;
-$('#devApply').onclick=()=>{
-  const m=DEVICES[devBrand.value][+devModel.value]; if(!m) return;
-  screenProf={brand:devBrand.value,model:m[0],pw:Math.min(m[1],m[2]),ph:Math.max(m[1],m[2]),custom:false};
-  ls.set('eqp-screen',screenProf); closeDev(); fit(); setTimeout(fit,200);
-  toast('Screen set: '+m[1]+' × '+m[2],2600);
-};
-
-
-/* ---- interactive edge calibrator ---- */
-const calWrap=$('#calWrap'), calBox=$('#calBox'), calRead=$('#calRead');
-const cal={L:40,T:40,R:40,B:40,mode:1}, CAL_MIN=160;     // mode 1 = expand outward, -1 = shrink inward
-const calSize=()=>{ const r=calWrap.getBoundingClientRect(); return [Math.round(r.width),Math.round(r.height)]; };
-function calApply(){
-  const sz=calSize(), W=sz[0], H=sz[1];
-  cal.L=clamp(cal.L,0,Math.max(0,W-CAL_MIN-cal.R)); cal.R=clamp(cal.R,0,Math.max(0,W-CAL_MIN-cal.L));
-  cal.T=clamp(cal.T,0,Math.max(0,H-CAL_MIN-cal.B)); cal.B=clamp(cal.B,0,Math.max(0,H-CAL_MIN-cal.T));
-  calBox.style.left=cal.L+'px'; calBox.style.right=cal.R+'px'; calBox.style.top=cal.T+'px'; calBox.style.bottom=cal.B+'px';
-  calRead.textContent=(W-cal.L-cal.R)+' × '+(H-cal.T-cal.B);
-}
-function calNudge(edge,px){
-  const k={U:'T',D:'B',L:'L',R:'R'}[edge]; if(!k) return;
-  cal[k]=Math.max(0,cal[k]-cal.mode*px);   // expand = edge moves out (inset shrinks); shrink = edge moves in
-  calApply();
-}
-function calMode(m){ cal.mode=m; $('#calOut').classList.toggle('sel',m===1); $('#calIn').classList.toggle('sel',m===-1); }
-let calHold=null;
-function calHoldStart(edge){
-  calNudge(edge,1);                           // single tap = exactly 1px
-  const t0=performance.now(); let last=t0, acc=0;
-  const h={raf:0}; calHold=h;
-  const tick=now=>{
-    if(calHold!==h) return;
-    const held=now-t0;
-    if(held>350){                             // press-and-hold: smooth, accelerating
-      acc+=(70+Math.min(380,(held-350)/1000*190))*(now-last)/1000;
-      const n=Math.floor(acc); if(n>=1){ acc-=n; calNudge(edge,n); }
-    }
-    last=now; h.raf=requestAnimationFrame(tick);
-  };
-  h.raf=requestAnimationFrame(tick);
-}
-function calHoldStop(){ if(calHold){ cancelAnimationFrame(calHold.raf); calHold=null; } }
-document.querySelectorAll('.cdpad button').forEach(b=>{
-  b.addEventListener('pointerdown',e=>{ e.preventDefault(); try{b.setPointerCapture(e.pointerId);}catch(_){} calHoldStart(b.dataset.e); });
-  ['pointerup','pointercancel','lostpointercapture'].forEach(ev=>b.addEventListener(ev,calHoldStop));
-  b.addEventListener('contextmenu',e=>e.preventDefault());
-});
-calWrap.addEventListener('contextmenu',e=>e.preventDefault());
-$('#calOut').onclick=()=>calMode(1);
-$('#calIn').onclick=()=>calMode(-1);
-function openCal(){
-  cal.L=cal.T=cal.R=cal.B=40; calMode(1);
-  calWrap.classList.add('show'); calApply();
-}
-function closeCal(){ calHoldStop(); calWrap.classList.remove('show'); }
-$('#calReset').onclick=()=>{ cal.L=cal.T=cal.R=cal.B=40; calApply(); };
-$('#calCancel').onclick=closeCal;
-$('#calDone').onclick=()=>{
-  const sz=calSize(), a=sz[0]-cal.L-cal.R, b=sz[1]-cal.T-cal.B;
-  screenProf={brand:'Custom',model:'Calibrated screen',pw:Math.min(a,b),ph:Math.max(a,b),custom:true};
-  ls.set('eqp-screen',screenProf);
-  closeCal(); closeDev(); fit(); setTimeout(fit,200);
-  toast('Screen locked: '+a+' × '+b,3000);
-};
-$('#devHere').onclick=openCal;
-$('#devHere').addEventListener('keydown',e=>{ if(e.key==='Enter'||e.key===' '){ e.preventDefault(); openCal(); } });
-document.addEventListener('keydown',e=>{
-  if(!calWrap.classList.contains('show')) return;
-  const k={ArrowUp:'U',ArrowDown:'D',ArrowLeft:'L',ArrowRight:'R'}[e.key];
-  if(k){ e.preventDefault(); calNudge(k,e.shiftKey?10:1); }
-  else if(e.key==='Escape') closeCal();
-});
-window.addEventListener('resize',()=>{ if(calWrap.classList.contains('show')) calApply(); });
+window.addEventListener('orientationchange',()=>{ setTimeout(fit,100); setTimeout(fit,500); });
+window.addEventListener('load',()=>{ setTimeout(fit,100); setTimeout(fit,600); });
+function pickerStart(){}
+function pickerEnd(){ setTimeout(fit,300); }
 
 /* ---------- bottom navigation, screens, menu, EQ sub-modes ---------- */
-let curTab='player', rightTab='library';
+let curTab='library';
 const navBtns=[...document.querySelectorAll('#nav button')];
 function setTab(t){
   if(t==='menu'){ openMenu(); return; }
-  curTab=t; if(t!=='player') rightTab=t;
+  closeNP(); closeQueue(); closeEqSheet(true);
+  curTab=t;
   const cl=stage.classList;
-  ['player','library','eq','search'].forEach(x=>{ cl.toggle('t-'+x,x===t); cl.toggle('r-'+x,x===rightTab); });
+  ['library','eq','search'].forEach(x=>cl.toggle('t-'+x,x===t));
   navBtns.forEach(b=>b.classList.toggle('act',b.dataset.t===t));
   if(t==='search') $('#search').focus();
   vizDirty=true; setTimeout(()=>{ sizeViz(); drawWave(); if(t==='library') scrollToCurrent(); },30);
@@ -1264,15 +1195,11 @@ navBtns.forEach(b=>b.onclick=()=>setTab(b.dataset.t));
 const menuWrap=$('#menuWrap');
 function openMenu(){
   markSettingsSeen();
-  const s=screenProf;
-  $('#menuDevS').textContent=s?((s.custom?'Calibrated':s.model)+' · '+s.pw+'×'+s.ph):'Not set';
   menuWrap.classList.add('show');
 }
 function closeMenu(){ menuWrap.classList.remove('show'); }
 $('#menuDone').onclick=closeMenu;
 menuWrap.addEventListener('pointerdown',e=>{ if(e.target===menuWrap) closeMenu(); });
-$('#menuDev').onclick=()=>{ closeMenu(); openDev(); };
-$('#menuCal').onclick=()=>{ closeMenu(); openCal(); };
 $('#autoM').onclick=()=>{ state.auto=!state.auto; update(); };
 stage.addEventListener('scroll',()=>{ stage.scrollTop=0; stage.scrollLeft=0; });
 const eqSec=$('#sEq');
@@ -1285,18 +1212,19 @@ function setEqMode(m){
 }
 document.querySelectorAll('#eqModes button').forEach(b=>b.onclick=()=>setEqMode(b.dataset.m));
 document.querySelectorAll('#rvPills button').forEach(b=>b.onclick=()=>{ state.revType=b.dataset.r; applying=true; update(); applying=false; });
-function initUI(){ setEqMode(prefs.eqm); setLibTab('songs'); setTab('player'); }
+function initUI(){ setEqMode(prefs.eqm); setLibTab('songs'); setTab('library'); }
 
 /* ---------- colour theme (spectrum picker) ---------- */
 const T={acc:'#ffa000',acc2:'#ff8f00',mid:'#ffb300',rgb:'255,160,0'};
-let theme=Object.assign({h:38,s:100},ls.get('eqp-theme',{}));
+let theme=Object.assign({h:353,s:96},ls.get('eqp-theme',{}));
 theme.h=clamp(+theme.h||0,0,360); theme.s=clamp(isFinite(+theme.s)?+theme.s:100,0,100);
-const THEMES=[['Amber',38,100],['Red',2,90],['Pink',325,85],['Violet',268,85],['Blue',212,100],['Cyan',186,100],['Green',140,80],['Lime',78,90],['Mono',0,0]];
+const THEMES=[['Apple Music red',353,96],['Amber',38,100],['Red',2,90],['Pink',325,85],['Violet',268,85],['Blue',212,100],['Cyan',186,100],['Green',140,80],['Lime',78,90],['Mono',0,0]];
 const hsl=(h,s,l)=>'hsl('+(((h%360)+360)%360).toFixed(0)+','+s.toFixed(0)+'%,'+l+'%)';
 function hslRgb(h,s,l){ s/=100;l/=100; const k=n=>(n+h/30)%12, a=s*Math.min(l,1-l), f=n=>l-a*Math.max(-1,Math.min(k(n)-3,Math.min(9-k(n),1))); return [f(0),f(8),f(4)].map(v=>Math.round(v*255)); }
 function applyTheme(save){
   const h=theme.h, s=theme.s, st=document.documentElement.style;
   T.acc=hsl(h,s,50); T.acc2=hsl(h-4,s,48); T.mid=hsl(h+4,s,52); T.rgb=hslRgb(h,s,50).join(',');
+  if(h===353&&Math.round(s)===96){ T.acc='#FA243C'; T.rgb='250,36,60'; }
   st.setProperty('--acc',T.acc); st.setProperty('--acc2',T.acc2); st.setProperty('--mid',T.mid); st.setProperty('--hi',hsl(h+8,s,60));
   st.setProperty('--edge',hsl(h,s,65)); st.setProperty('--ink',hsl(h,Math.max(s,20),5)); st.setProperty('--dk',hsl(h,s,9)); st.setProperty('--deep',hsl(h-5,s,40));
   st.setProperty('--rgb',T.rgb); st.setProperty('--glow','rgba('+T.rgb+',.45)');
@@ -1321,7 +1249,7 @@ function applyTheme(save){
   $('#themeBtn').onclick=()=>wrap.classList.add('show');
   $('#themeDone').onclick=()=>wrap.classList.remove('show');
   wrap.addEventListener('pointerdown',e=>{ if(e.target===wrap) wrap.classList.remove('show'); });
-  $('#themeReset').onclick=()=>{theme.h=38;theme.s=100;applyTheme(true);};
+  $('#themeReset').onclick=()=>{theme.h=353;theme.s=96;applyTheme(true);};
 })();
 
 /* ---------- stereo level meters (ballistic) + spectrum / scope + band LEDs ---------- */
@@ -1354,6 +1282,7 @@ function updateMeter(now,dt){
       elVal[c].style.color=mHold[c]>CLIP_DB?'var(--bad)':'';
     }
     elLim.textContent=gr<-0.4?'LIM '+gr.toFixed(1):'';
+    const lt=$('#mlimTxt'); if(lt) lt.textContent=gr<-0.4?gr.toFixed(1)+' dB':'0.0 dB';
   }
 }
 clipBtn.onclick=()=>{ overT=-1e9; clipBtn.classList.remove('hot'); };
@@ -1480,7 +1409,7 @@ function frame(now){
   const dt=Math.min(0.1,(now-lastRaf)/1000||0.016); lastRaf=now;
   vizDirty=false;
   const cl=stage.classList;
-  if(cl.contains('t-eq')||(cl.contains('wide')&&cl.contains('r-eq'))){
+  if(cl.contains('t-eq')||cl.contains('eq-sheet')){
     an.getByteFrequencyData(fbuf);
     updateMeter(now,dt); drawViz(now,dt); updateBandLevels(now,dt);
   }
@@ -1655,74 +1584,44 @@ function viewList(){ return lib; }
 function syncQueue(){ if(qsrc==='all') queue=lib.map(t=>t.id); }
 const seek=$('#seek'), vol=$('#vol');
 const fillR=el=>{ const mn=+el.min||0, mx=+el.max||100; el.style.setProperty('--p',((+el.value-mn)/(mx-mn)*100).toFixed(1)+'%'); };
-const setSeek=v=>{ seek.value=v; fillR(seek); drawWave(); };
+const setSeek=v=>{ seek.value=v; drawWave(); };
 
-/* ---- wave seekbar ---- */
-const waveC=$('#wave'), wx=waveC.getContext('2d');
-const WN=240, waveCache=ls.get('eqp-wave',{});
-let waveReal=false, waveAmt=1;            // waveReal: peaks are from the song; waveAmt animates them in
-function saveWave(id,a){
-  try{ waveCache[id]=a.map(v=>String.fromCharCode(65+Math.round(v*25))).join(''); const k=Object.keys(waveCache); if(k.length>400) delete waveCache[k[0]]; ls.set('eqp-wave',waveCache); }catch(e){}
-}
-function useWave(a){ wpeaks=a; waveReal=true; waveAmt=0; drawWave(); }
-async function loadWave(id,buf){
-  waveReal=false;
-  const c=waveCache[id];
-  if(typeof c==='string'&&c.length===WN){ useWave(c.split('').map(ch=>(ch.charCodeAt(0)-65)/25)); return; }
-  if(buf.byteLength>60*1048576) return;                       // very long files: keep the placeholder
-  try{
-    const ab=await new Promise((res,rej)=>{ const p=ac.decodeAudioData(buf.slice(0),res,rej); if(p&&p.catch) p.catch(rej); });
-    if(curId!==id) return;
-    const chs=[]; for(let i=0;i<ab.numberOfChannels;i++) chs.push(ab.getChannelData(i));
-    const len=ab.length, out=new Array(WN).fill(0);
-    for(let b=0;b<WN;b++){
-      const s0=Math.floor(b*len/WN), s1=Math.floor((b+1)*len/WN), step=Math.max(1,Math.floor((s1-s0)/600));
-      let pk=0, sq=0, n=0;
-      for(let i=s0;i<s1;i+=step){ let m=0; for(let k=0;k<chs.length;k++){ const v=Math.abs(chs[k][i]); if(v>m) m=v; } if(m>pk) pk=m; sq+=m*m; n++; }
-      out[b]=0.55*Math.sqrt(sq/Math.max(1,n))+0.45*pk;
-    }
-    let mx=0; out.forEach(v=>{ if(v>mx) mx=v; });
-    const peaks=out.map(v=>mx>0?Math.pow(v/mx,0.8):0);
-    saveWave(id,peaks);
-    if(curId===id) useWave(peaks);
-  }catch(e){}
-}
-let wpeaks=[], wdrag=false;
-function seedWave(id){
-  const r=(Math.imul((id|0)+7,2654435761)>>>0)%1000, p1=r*.013, p2=r*.031, a=[];
-  let s=(r*7919+13)>>>0||1; const rnd=()=>{ s^=s<<13; s>>>=0; s^=s>>>17; s^=s<<5; s>>>=0; return s/4294967296; };
-  for(let i=0;i<180;i++) a.push(.2+.8*Math.abs(Math.sin(i*.11+p1)*.55+Math.sin(i*.037+p2)*.45)*(.55+.45*rnd()));
-  wpeaks=a; waveReal=false;
-}
-seedWave(7);
-function drawWave(now){
-  const w=waveC.clientWidth, h=waveC.clientHeight; if(!w||!h) return;
-  const k=Math.min(2,Math.max(1,(window.devicePixelRatio||1)*Math.min(1,scale)));
-  const pw=Math.round(w*k), ph=Math.round(h*k);
-  if(waveC.width!==pw||waveC.height!==ph){ waveC.width=pw; waveC.height=ph; }
-  wx.setTransform(k,0,0,k,0,0); wx.clearRect(0,0,w,h);
-  const dur=nowDur(), frac=wdrag?seek.value/1000:(dur>0?clamp(nowTime()/dur,0,1):0);
-  const n=Math.max(24,Math.floor(w/5)), pitch=w/n, bw=Math.max(2,pitch-2), mid=h/2, playing=!isPausedNow();
-  if(waveReal&&waveAmt<1){ waveAmt=Math.min(1,waveAmt+0.06); requestAnimationFrame(()=>drawWave()); }
-  const pulse=playing?(0.5+0.5*Math.sin((now||performance.now())/140)):0;
-  for(let i=0;i<n;i++){
-    const pk=waveReal?wpeaks[Math.floor(i/n*wpeaks.length)]*waveAmt:0.1;
-    let bh=Math.max(4,pk*h*.94);
-    const f=(i+.5)/n;
-    if(playing&&Math.abs(f-frac)<.02) bh=Math.min(h,bh*(1+.25*pulse));
-    wx.fillStyle=f<=frac?T.acc:'#3b3b3b';
-    wx.fillRect(i*pitch+(pitch-bw)/2,mid-bh/2,bw,bh);
+/* ---- timeline scrubber (thumb-less; 4px at rest, 9px while touched) ---- */
+const scrub=$('#scrub'), scrubFill=$('#scrubFill'), curEl=$('#cur'), durEl=$('#dur');
+let wdrag=false, lastDurTxt='', lastNowAttr=-1;
+const WN=240, waveCache={};                                   // waveform peaks are no longer drawn
+function seedWave(){} function useWave(){} async function loadWave(){}
+function drawWave(){
+  const dur=nowDur(), t=nowTime();
+  const frac=wdrag?seek.value/1000:(dur>0?clamp(t/dur,0,1):0);
+  scrubFill.style.width=(frac*100).toFixed(2)+'%';
+  const cur=wdrag?frac*dur:t;
+  const txt=dur>0?'-'+fmtTime(Math.max(0,dur-cur)):'0:00';
+  if(txt!==lastDurTxt){ lastDurTxt=txt; durEl.textContent=txt; }
+  const sec=Math.floor(cur);
+  if(sec!==lastNowAttr){
+    lastNowAttr=sec;
+    scrub.setAttribute('aria-valuemax',String(Math.round(dur)||0));
+    scrub.setAttribute('aria-valuenow',String(sec));
+    scrub.setAttribute('aria-valuetext',fmtTime(cur)+(dur>0?' of '+fmtTime(dur):''));
   }
-  wx.fillStyle='#fff'; wx.fillRect(clamp(frac*w-1,0,w-2),2,2,h-4);
 }
-const wfrac=e=>{ const r=waveC.getBoundingClientRect(); return clamp((e.clientX-r.left)/Math.max(1,r.width),0,1); };
-function wmove(e){ const f=wfrac(e); seek.value=Math.round(f*1000); if(nowDur()) $('#cur').textContent=fmtTime(f*nowDur()); drawWave(); }
-waveC.addEventListener('pointerdown',e=>{ if(!nowDur()) return; e.preventDefault(); wdrag=true; seeking=true; try{waveC.setPointerCapture(e.pointerId);}catch(_){} wmove(e); });
-waveC.addEventListener('pointermove',e=>{ if(wdrag) wmove(e); });
-function wend(){ if(!wdrag) return; wdrag=false; if(nowDur()) seekTo(seek.value/1000*nowDur()); seeking=false; lyrTick(true); savePos(); drawWave(); }
-waveC.addEventListener('pointerup',wend); waveC.addEventListener('pointercancel',wend);
-if(window.ResizeObserver) new ResizeObserver(()=>drawWave()).observe(waveC);
-
+const wfrac=e=>{ const r=scrub.getBoundingClientRect(); return clamp((e.clientX-r.left)/Math.max(1,r.width),0,1); };
+function wmove(e){ const f=wfrac(e); seek.value=Math.round(f*1000); if(nowDur()) curEl.textContent=fmtTime(f*nowDur()); drawWave(); }
+scrub.addEventListener('pointerdown',e=>{ if(!nowDur()) return; e.preventDefault(); wdrag=true; seeking=true; scrub.classList.add('drag'); try{scrub.setPointerCapture(e.pointerId);}catch(_){} wmove(e); });
+scrub.addEventListener('pointermove',e=>{ if(wdrag) wmove(e); });
+function wend(){ if(!wdrag) return; wdrag=false; scrub.classList.remove('drag'); if(nowDur()) seekTo(seek.value/1000*nowDur()); seeking=false; lyrTick(true); savePos(); drawWave(); }
+scrub.addEventListener('pointerup',wend); scrub.addEventListener('pointercancel',wend); scrub.addEventListener('lostpointercapture',wend);
+scrub.addEventListener('keydown',e=>{
+  const dur=nowDur(); if(!dur) return;
+  let t=nowTime(), n=null;
+  if(e.key==='ArrowRight'||e.key==='ArrowUp') n=t+5;
+  else if(e.key==='ArrowLeft'||e.key==='ArrowDown') n=t-5;
+  else if(e.key==='PageUp') n=t+30; else if(e.key==='PageDown') n=t-30;
+  else if(e.key==='Home') n=0; else if(e.key==='End') n=dur-1;
+  if(n==null) return;
+  e.preventDefault(); seekTo(clamp(n,0,dur)); lyrTick(true); drawWave();
+});
 /* ---- audio badge (MP3 · 44.1kHz · Stereo) read from the first MPEG frame ---- */
 function audioFmt(buf,name){
   const ext=((name||'').match(/\.([a-z0-9]+)$/i)||[0,''])[1].toUpperCase()||'AUDIO';
@@ -1736,6 +1635,8 @@ function audioFmt(buf,name){
         const ver=(b[i+1]>>3)&3, lay=(b[i+1]>>1)&3, sr=(b[i+2]>>2)&3;
         if(ver===1||lay===0||sr===3) continue;
         const hz=[[11025,12000,8000],0,[22050,24000,16000],[44100,48000,32000]][ver][sr];
+        const br=(ver===3?[0,32,40,48,56,64,80,96,112,128,160,192,224,256,320]:[0,8,16,24,32,40,48,56,64,80,96,112,128,144,160])[(b[i+2]>>4)&15];
+        if(lay===1&&br) return 'MP3 · '+br+' kbps';
         return 'MP3 · '+(hz/1000)+'kHz · '+(((b[i+3]>>6)&3)===3?'Mono':'Stereo');
       }
     }
@@ -1795,7 +1696,7 @@ function setLibTab(t){
 document.querySelectorAll('#libTabs button').forEach(b=>b.onclick=()=>setLibTab(b.dataset.lt));
 $('#libBack').onclick=()=>{ libGroup=null; renderLibList(); listEl.scrollTop=0; };
 function markCurrent(){
-  const pl=!isPausedNow();
+  const pl=!isPausedNow(); syncPlayState();
   [listEl,searchEl].forEach(el=>{
     el.classList.toggle('playing',pl);
     el.querySelectorAll('.track').forEach(r=>r.classList.toggle('cur',curId!=null&&+r.dataset.id===curId));
@@ -1811,7 +1712,7 @@ function playFrom(e,ids,src){
   const row=e.target.closest('.track'); if(!row||row.classList.contains('grp')) return;
   const id=+row.dataset.id;
   if(e.target.closest('.rm')){ e.stopPropagation(); askRemove(id); return; }
-  ensureUnlocked(); queue=ids.slice(); qsrc=src; loadTrack(id,{play:true});
+  ensureUnlocked(); queue=ids.slice(); qsrc=src; ls.set('eqp-queue',null); loadTrack(id,{play:true});
 }
 listEl.addEventListener('click',e=>{
   const g=e.target.closest('.grp');
@@ -1850,19 +1751,63 @@ function ensureUnlocked(){
   if(p&&p.then) p.then(done,done); else done();
 }
 
+/* ---- colour-bleed mesh: 3-4 dominant colours from the cover drive the drifting orbs ---- */
+const MESH_DEF=['#fa243c','#7a3cff','#ff7a45','#2a64ff'];
+function meshSet(c){ const st=document.documentElement.style; for(let i=0;i<4;i++) st.setProperty('--o'+(i+1),c[i]||MESH_DEF[i]); }
+function rgb2hsl(r,g,b){ r/=255;g/=255;b/=255; const mx=Math.max(r,g,b), mn=Math.min(r,g,b), l=(mx+mn)/2, d=mx-mn; let h=0,sa=0;
+  if(d){ sa=l>.5?d/(2-mx-mn):d/(mx+mn); h=mx===r?((g-b)/d+(g<b?6:0)):mx===g?((b-r)/d+2):((r-g)/d+4); h*=60; } return [h,sa,l]; }
+function meshFrom(url){
+  if(!url){ meshSet(MESH_DEF); return; }
+  const img=new Image(); img.crossOrigin='anonymous';
+  img.onload=()=>{
+    try{
+      const c=document.createElement('canvas'); c.width=c.height=32;
+      const x=c.getContext('2d',{willReadFrequently:true}); x.drawImage(img,0,0,32,32);
+      const d=x.getImageData(0,0,32,32).data, bins=Array.from({length:12},()=>({w:0,h:0,s:0,l:0}));
+      for(let i=0;i<d.length;i+=4){
+        const [h,sa,l]=rgb2hsl(d[i],d[i+1],d[i+2]); if(l<.1||l>.93) continue;
+        const w=(.15+sa)*(1-Math.abs(2*l-1)), b=bins[Math.floor(h/30)%12];
+        b.w+=w; b.h+=h*w; b.s+=sa*w; b.l+=l*w;
+      }
+      const top=bins.filter(b=>b.w>0).sort((a,b)=>b.w-a.w).slice(0,4)
+        .map(b=>'hsl('+Math.round(b.h/b.w)+','+Math.round(clamp(b.s/b.w,.45,.9)*100)+'%,'+Math.round(clamp(b.l/b.w,.38,.58)*100)+'%)');
+      while(top.length<4) top.push(MESH_DEF[top.length]);
+      meshSet(top);
+    }catch(e){ meshSet(MESH_DEF); }
+  };
+  img.onerror=()=>meshSet(MESH_DEF);
+  img.src=url;
+}
+function paintArt(url){
+  const v=url?'url("'+url+'")':'';
+  ['#art','#art2','#miniArt'].forEach(sel=>{ const el=$(sel); el.style.backgroundImage=v; });
+  $('#art').textContent=url?'':'♪';
+  $('#miniArt').textContent=url?'':'♪';
+  meshFrom(url);
+}
+function setTitle(el,text){
+  el.textContent=text; el.classList.remove('mq'); el.style.removeProperty('--mq');
+  requestAnimationFrame(()=>{
+    const over=el.scrollWidth-el.clientWidth;
+    if(over>2){ const sp=document.createElement('span'); sp.textContent=text; el.textContent=''; el.appendChild(sp); el.style.setProperty('--mq',-(over+12)+'px'); el.classList.add('mq'); }
+  });
+}
 function setCover(c){
   if(coverUrl){URL.revokeObjectURL(coverUrl);coverUrl=null;}
-  const art=$('#art'), amb=$('#ambient');
-  if(c&&c.buf){ coverUrl=URL.createObjectURL(new Blob([c.buf],{type:c.type||'image/jpeg'})); art.style.backgroundImage='url("'+coverUrl+'")'; art.textContent=''; amb.style.backgroundImage='url("'+coverUrl+'")'; amb.classList.add('has'); }
-  else { art.style.backgroundImage=''; art.textContent='♪'; amb.style.backgroundImage=''; amb.classList.remove('has'); }
+  if(c&&c.buf){ coverUrl=URL.createObjectURL(new Blob([c.buf],{type:c.type||'image/jpeg'})); paintArt(coverUrl); }
+  else paintArt(null);
 }
 function renderNow(t){
-  $('#tTitle').textContent=t?t.title:'No track loaded';
+  setTitle($('#tTitle'),t?t.title:'No track loaded');
+  $('#tTitle2').textContent=t?t.title:''; $('#tArtist2').textContent=t?(t.artist||'Unknown artist'):'';
+  $('#miniT').textContent=t?t.title:'Not playing'; $('#miniA').textContent=t?(t.artist||'Unknown artist'):' ';
   $('#tBadge').textContent=t?(t.fmt||''):'';
-  $('#tArtist').textContent=t?(t.artist||'Unknown artist'):' ';
+  $('#tArtist').textContent=t?(t.artist||'Unknown artist'):' ';
   const pos=t?queue.indexOf(t.id):-1;
   $('#tSub').textContent=t?((t.album?t.album+' · ':'')+(pos>=0?'Track '+(pos+1)+' of '+queue.length:'')):'Open Library to add your MP3s';
-  if(!t){ setCover(null); $('#cur').textContent='0:00'; $('#dur').textContent='0:00'; setSeek(0); }
+  if(!t){ setCover(null); curEl.textContent='0:00'; setSeek(0); }
+  if(typeof syncFav==='function') syncFav();
+  if(typeof qRender==='function') qRender();
 }
 async function loadTrack(id,opts){
   opts=opts||{}; const t=byId(id); if(!t) return;
@@ -2069,7 +2014,7 @@ audio.addEventListener('ended',()=>{
 });
 function repeatOne(){ if(prefs.repeat===2){audio.currentTime=0;audio.play().catch(()=>{});return true;} return false; }
 audio.addEventListener('loadedmetadata',()=>{
-  $('#dur').textContent=fmtTime(audio.duration); lyrTryStart();
+  drawWave(); lyrTryStart();
   if(pendingPos>0&&isFinite(audio.duration)){ try{audio.currentTime=Math.min(pendingPos,Math.max(0,audio.duration-1));}catch(e){} }
   pendingPos=0;
 });
@@ -2167,7 +2112,7 @@ function markSettingsSeen(){
 
 /* ----- lyrics view ----- */
 const lyrBtn=$('#lyrBtn'), lyrWrap=$('#lyrWrap'), lyrScroll=$('#lyrScroll'), lyrInner=$('#lyrInner'), lyrMsg=$('#lyrMsg');
-const lyr={open:false,id:0,ac:null,req:null,lines:[],synced:false,els:[],idx:-1,cur:null};
+const lyr={open:false,id:0,ac:null,req:null,lines:[],synced:false,els:[],idx:-1,cur:null,manual:false};
 function lyrShow(msg){ lyrMsg.textContent=msg||''; lyrMsg.hidden=!msg; lyrScroll.hidden=!!msg; }
 function lyrSetLines(lines,synced){
   lyr.lines=lines; lyr.synced=synced; lyr.idx=-1;
@@ -2183,6 +2128,13 @@ function lyrSetLines(lines,synced){
   lyrInner.textContent=''; lyrInner.appendChild(frag);
   lyrScroll.scrollTop=0;
 }
+function lyrBlur(ans){
+  if(!lyr.synced) return;
+  for(let i=0;i<lyr.els.length;i++){
+    const d=ans<0?3:Math.abs(i-ans);
+    lyr.els[i].style.filter=d===0?'':'blur('+(d===1?1:2.5)+'px)';
+  }
+}
 function lyrCancel(){ lyr.id++; if(lyr.ac){ lyr.ac.abort(); lyr.ac=null; } lyr.req=null; }
 function lyrCenter(el,smooth){
   const top=el.offsetTop-(lyrScroll.clientHeight-el.offsetHeight)/2;
@@ -2197,7 +2149,8 @@ function lyrTick(force){
   if(ans===lyr.idx&&!force) return;
   if(lyr.els[lyr.idx]) lyr.els[lyr.idx].classList.remove('act');
   lyr.idx=ans;
-  if(ans>=0&&lyr.els[ans]){ lyr.els[ans].classList.add('act'); lyrCenter(lyr.els[ans],!force); }
+  if(ans>=0&&lyr.els[ans]){ lyr.els[ans].classList.add('act'); if(!lyr.manual||force) lyrCenter(lyr.els[ans],!force); }
+  lyrBlur(ans);
 }
 function lyrRequest(t,buf){
   lyrCancel(); lyrSetLines([],false); lyr.cur=t;
@@ -2234,8 +2187,8 @@ function syncLyrUI(){
   const sw=(el,on)=>{ el.setAttribute('aria-checked',on?'true':'false'); el.querySelector('.switch').classList.toggle('on',on); };
   sw($('#lyrTog'),lyrCfg.on); sw($('#lyrAi'),lyrCfg.ai);
   if(!lyrCfg.on) lyr.open=false;
-  lyrBtn.hidden=!lyrCfg.on;
-  lyrBtn.classList.toggle('on',lyr.open);
+  lyrBtn.classList.toggle('on',lyr.open); lyrBtn.setAttribute('aria-pressed',lyr.open?'true':'false');
+  if(!lyr.open) lyrSync.hidden=true;
   lyrWrap.hidden=!lyr.open;
   stage.classList.toggle('lyr-on',lyr.open);
 }
@@ -2251,14 +2204,21 @@ function setLyricsOn(on){
     }
   }
 }
-lyrBtn.onclick=()=>{ lyr.open=!lyr.open; syncLyrUI(); if(lyr.open) lyrTick(true); };
+const lyrSync=$('#lyrSync');
+lyrBtn.onclick=()=>{
+  if(!lyrCfg.on){ setLyricsOn(true); lyr.open=true; }
+  else lyr.open=!lyr.open;
+  lyr.manual=false; syncLyrUI(); if(lyr.open) lyrTick(true);
+};
+['wheel','touchmove'].forEach(ev=>lyrScroll.addEventListener(ev,()=>{ if(!lyr.synced) return; lyr.manual=true; lyrSync.hidden=false; },{passive:true}));
+lyrSync.onclick=()=>{ lyr.manual=false; lyrSync.hidden=true; lyrTick(true); };
 $('#lyrTog').onclick=()=>setLyricsOn(!lyrCfg.on);
 $('#lyrAi').onclick=()=>{ lyrCfg.ai=!lyrCfg.ai; ls.set('eqp-lyrics-ai',lyrCfg.ai); syncLyrUI(); };
 lyrInner.addEventListener('click',e=>{
   const d=e.target.closest('.lyl');
   if(!d||!lyr.synced||d.dataset.i==null) return;
   seekTo(lyr.lines[+d.dataset.i].t);
-  lyrTick(true);
+  lyr.manual=false; lyrSync.hidden=true; lyrTick(true);
 });
 
 /* ----- streaming: settings UI, import, and playback adapter ----- */
@@ -2371,11 +2331,7 @@ async function loadStreamTrack(t,opts){
   curId=t.id; seedWave(t.id); renderNow(t); markCurrent(); scrollToCurrent();
   document.body.classList.add('stream-dsp');
   setCover(null);
-  if(t.art){
-    const art=$('#art'), amb=$('#ambient');
-    art.style.backgroundImage='url("'+t.art+'")'; art.textContent='';
-    amb.style.backgroundImage='url("'+t.art+'")'; amb.classList.add('has');
-  }
+  if(t.art) paintArt(t.art);
   $('#tSub').textContent+=' · EQ bypassed';
   $('#tBadge').textContent=t.fmt||SRC_NAME[t.source]||'';
   setMediaSession(t);
@@ -2385,7 +2341,180 @@ async function loadStreamTrack(t,opts){
   playBtn.innerHTML=SX.isPlaying()?ICON.pause:ICON.play;
 }
 
+/* ---------- Apple Music shell: MiniPlayer, Now Playing sheet, EQ sheet, Up Next, favourites ---------- */
+const npEl=$('#sPlayer'), miniEl=$('#mini'), miniPlay=$('#miniPlay'), qSheet=$('#qSheet'), qList=$('#qList');
+const favBtn=$('#favBtn'), moreBtn=$('#moreBtn'), morePop=$('#morePop');
+const favs=new Set(ls.get('eqp-favs',[]));
+function syncPlayState(){
+  stage.classList.toggle('paused',isPausedNow()||curId==null);
+  miniPlay.innerHTML=playBtn.innerHTML;
+}
+new MutationObserver(syncPlayState).observe(playBtn,{childList:true,subtree:true});
+$('#miniNext').innerHTML=ICON.next;
+miniPlay.onclick=e=>{ e.stopPropagation(); playBtn.click(); };
+$('#miniNext').onclick=e=>{ e.stopPropagation(); $('#next').click(); };
+
+/* open / close the Now Playing sheet (450ms, cubic-bezier(.32,.72,0,1)) */
+function openNP(){
+  stage.classList.add('np-open'); npEl.setAttribute('aria-hidden','false'); vizDirty=true;
+  setTimeout(()=>{ drawWave(); if(lyr.open) lyrTick(true); },80);
+}
+function closeNP(){
+  if(!stage.classList.contains('np-open')) return;
+  stage.classList.remove('np-open'); npEl.setAttribute('aria-hidden','true'); closeMore(); closeEqSheet(true); closeQueue();
+}
+(function(){
+  // mini player: tap, Enter/Space, or swipe up
+  let y0=null, moved=false;
+  miniEl.addEventListener('pointerdown',e=>{ y0=e.clientY; moved=false; });
+  miniEl.addEventListener('pointermove',e=>{ if(y0!=null&&y0-e.clientY>26&&!moved){ moved=true; openNP(); } });
+  miniEl.addEventListener('pointerup',()=>{ y0=null; });
+  miniEl.addEventListener('pointercancel',()=>{ y0=null; });
+  miniEl.addEventListener('click',e=>{ if(e.target.closest('button')||moved){ moved=false; return; } openNP(); });
+  miniEl.addEventListener('keydown',e=>{ if((e.key==='Enter'||e.key===' ')&&e.target===miniEl){ e.preventDefault(); openNP(); } });
+  // grabber: tap or drag down to collapse
+  const g=$('#grab'); let sy=null, dy=0;
+  g.addEventListener('pointerdown',e=>{ sy=e.clientY; dy=0; npEl.style.transition='none'; try{g.setPointerCapture(e.pointerId);}catch(_){} });
+  g.addEventListener('pointermove',e=>{ if(sy==null) return; dy=Math.max(0,e.clientY-sy); npEl.style.transform='translateY('+dy+'px)'; });
+  const end=()=>{
+    if(sy==null) return; const d=dy; sy=null; dy=0;
+    npEl.style.transition=''; npEl.style.transform='';
+    if(d>110||d<4) closeNP();
+  };
+  g.addEventListener('pointerup',end); g.addEventListener('pointercancel',end);
+  g.addEventListener('keydown',e=>{ if(e.key==='Enter'||e.key===' '){ e.preventDefault(); closeNP(); } });
+})();
+
+/* favourites (tiny list in localStorage) */
+function syncFav(){
+  const on=curId!=null&&favs.has(curId);
+  favBtn.classList.toggle('on',on); favBtn.setAttribute('aria-pressed',on?'true':'false');
+  favBtn.querySelector('svg').style.fill=on?'currentColor':'none';
+}
+favBtn.onclick=()=>{ if(curId==null) return; if(favs.has(curId)) favs.delete(curId); else favs.add(curId); ls.set('eqp-favs',[...favs]); syncFav(); };
+
+/* ••• menu */
+function closeMore(){ morePop.hidden=true; moreBtn.setAttribute('aria-expanded','false'); }
+moreBtn.onclick=e=>{
+  e.stopPropagation();
+  if(!morePop.hidden){ closeMore(); return; }
+  const r=moreBtn.getBoundingClientRect();
+  morePop.hidden=false; moreBtn.setAttribute('aria-expanded','true');
+  morePop.style.top=Math.min(window.innerHeight-morePop.offsetHeight-12,r.bottom+8)+'px';
+  morePop.style.right=Math.max(12,window.innerWidth-r.right)+'px';
+};
+document.addEventListener('pointerdown',e=>{ if(!morePop.hidden&&!e.target.closest('#morePop,#moreBtn')) closeMore(); });
+morePop.addEventListener('click',e=>{ if(e.target.closest('#sleepBtn')) return; closeMore(); });
+$('#rmCur').onclick=()=>{ if(curId!=null) askRemove(curId); };
+
+/* Audio & EQ sheet: the EQ & DSP screen as a Liquid Glass sheet over Now Playing */
+let eqSheetT=0;
+function openEqSheet(){
+  clearTimeout(eqSheetT);
+  stage.classList.add('eq-sheet'); vizDirty=true;
+  requestAnimationFrame(()=>requestAnimationFrame(()=>{ stage.classList.add('eq-in'); sizeViz(); setTimeout(sizeViz,460); }));
+}
+function closeEqSheet(instant){
+  if(!stage.classList.contains('eq-sheet')) return;
+  stage.classList.remove('eq-in');
+  clearTimeout(eqSheetT);
+  if(instant){ stage.classList.remove('eq-sheet'); return; }
+  eqSheetT=setTimeout(()=>stage.classList.remove('eq-sheet'),460);
+}
+$('#eqBtn').onclick=openEqSheet;
+$('#eqDone').onclick=()=>closeEqSheet();
+
+/* Up Next: shuffle, repeat, drag-to-reorder, swipe-to-remove */
+const saveQueue=()=>{ qsrc='custom'; ls.set('eqp-queue',queue.slice()); };
+function qRender(){
+  if(!qSheet.classList.contains('show')) return;
+  const cur=queue.indexOf(curId);
+  $('#qNote').textContent=prefs.shuffle?'Shuffle is on: the next song is picked at random.':(queue.length?queue.length+' songs in the queue':'The queue is empty.');
+  const frag=document.createDocumentFragment();
+  queue.forEach((id,i)=>{
+    const t=byId(id); if(!t) return;
+    const row=document.createElement('div'); row.className='qrow'+(i===cur?' qnow':i<cur?' qpast':''); row.dataset.i=i;
+    row.innerHTML='<div class="qdel" aria-hidden="true">Remove</div><div class="qfg"><div class="qi"><div class="qt"></div><div class="qa"></div></div><button class="qx" aria-label="Remove from queue">✕</button><div class="qh" role="button" tabindex="0" aria-label="Drag to reorder"><svg class="s" viewBox="0 0 24 24"><path d="M5 8h14M5 12h14M5 16h14"/></svg></div></div>';
+    row.querySelector('.qt').textContent=t.title;
+    row.querySelector('.qa').textContent=(t.artist||'Unknown artist')+(i===cur?' · Playing':'');
+    frag.appendChild(row);
+  });
+  qList.textContent=''; qList.appendChild(frag);
+  if(!queue.length) qList.innerHTML='<div class="empty">Nothing queued</div>';
+}
+function qRemoveAt(i){
+  const id=queue[i]; queue.splice(i,1); saveQueue();
+  if(id===curId){ /* the song keeps playing; it just leaves the queue */ }
+  qRender(); renderNowTrackNo();
+}
+function renderNowTrackNo(){ const t=curId!=null?byId(curId):null; if(t){ const pos=queue.indexOf(t.id); $('#tSub').textContent=(t.album?t.album+' · ':'')+(pos>=0?'Track '+(pos+1)+' of '+queue.length:''); } }
+function openQueue(){ qSheet.classList.add('show'); qSheet.setAttribute('aria-hidden','false'); qRender(); const n=qList.querySelector('.qnow'); if(n) setTimeout(()=>n.scrollIntoView({block:'center'}),60); }
+function closeQueue(){ qSheet.classList.remove('show'); qSheet.setAttribute('aria-hidden','true'); }
+$('#qBtn').onclick=openQueue; $('#qDone').onclick=closeQueue;
+(function(){
+  // grabber drag-down closes the sheet
+  const g=$('#qGrab'); let sy=null, dy=0;
+  g.addEventListener('pointerdown',e=>{ sy=e.clientY; dy=0; qSheet.style.transition='none'; try{g.setPointerCapture(e.pointerId);}catch(_){} });
+  g.addEventListener('pointermove',e=>{ if(sy==null) return; dy=Math.max(0,e.clientY-sy); qSheet.style.transform='translateY('+dy+'px)'; });
+  const end=()=>{ if(sy==null) return; const d=dy; sy=null; dy=0; qSheet.style.transition=''; qSheet.style.transform=''; if(d>100) closeQueue(); };
+  g.addEventListener('pointerup',end); g.addEventListener('pointercancel',end);
+
+  // row interactions (event delegation)
+  let mode=null, row=null, x0=0, y0=0, top0=0, rowH=56, idx0=0;
+  qList.addEventListener('click',e=>{
+    const x=e.target.closest('.qx'); if(x){ qRemoveAt(+x.closest('.qrow').dataset.i); return; }
+    const r=e.target.closest('.qrow'); if(!r||e.target.closest('.qh')||r.dataset.swiped) return;
+    ensureUnlocked(); loadTrack(queue[+r.dataset.i],{play:true});
+  });
+  qList.addEventListener('pointerdown',e=>{
+    const r=e.target.closest('.qrow'); if(!r) return;
+    row=r; x0=e.clientX; y0=e.clientY; idx0=+r.dataset.i; rowH=r.offsetHeight||56; delete r.dataset.swiped;
+    if(e.target.closest('.qh')){ mode='drag'; e.preventDefault(); try{qList.setPointerCapture(e.pointerId);}catch(_){} r.classList.add('drag'); }
+    else mode='pending';
+  });
+  qList.addEventListener('pointermove',e=>{
+    if(!row) return;
+    const dx=e.clientX-x0, dy=e.clientY-y0;
+    if(mode==='pending'){
+      if(Math.abs(dx)>10&&Math.abs(dx)>Math.abs(dy)){ mode='swipe'; row.dataset.swiped='1'; try{qList.setPointerCapture(e.pointerId);}catch(_){} }
+      else if(Math.abs(dy)>10){ mode=null; row=null; return; }
+    }
+    if(mode==='swipe') row.querySelector('.qfg').style.transform='translateX('+Math.min(0,dx)+'px)';
+    else if(mode==='drag') row.style.transform='translateY('+dy+'px)';
+  });
+  const finish=e=>{
+    if(!row) return;
+    const dx=e.clientX-x0, dy=e.clientY-y0, r=row, m=mode; row=null; mode=null;
+    if(m==='swipe'){
+      const fg=r.querySelector('.qfg');
+      if(dx<-100){ fg.style.transform='translateX(-110%)'; setTimeout(()=>qRemoveAt(idx0),150); }
+      else fg.style.transform='';
+      setTimeout(()=>{ delete r.dataset.swiped; },60);
+    } else if(m==='drag'){
+      r.classList.remove('drag'); r.style.transform='';
+      const to=clamp(idx0+Math.round(dy/rowH),0,queue.length-1);
+      if(to!==idx0){ const [id]=queue.splice(idx0,1); queue.splice(to,0,id); saveQueue(); renderNowTrackNo(); }
+      qRender();
+    }
+  };
+  qList.addEventListener('pointerup',finish); qList.addEventListener('pointercancel',finish);
+})();
+document.addEventListener('keydown',e=>{
+  if(e.key!=='Escape') return;
+  if(qSheet.classList.contains('show')) closeQueue();
+  else if(!morePop.hidden) closeMore();
+  else if(stage.classList.contains('eq-sheet')) closeEqSheet();
+  else closeNP();
+});
+
+function initShell(){
+  const sq=ls.get('eqp-queue',null);
+  if(Array.isArray(sq)&&sq.length){ const ok=sq.filter(id=>byId(id)); if(ok.length){ queue=ok; qsrc='custom'; } }
+  syncPlayState(); syncFav(); drawWave();
+}
+
 function initGlue(){
+  initShell();
   syncLyrUI();
   syncStreamUI();
   $('#setDot').hidden=settingsSeen;
@@ -2399,7 +2528,6 @@ async function init(){
   $('#prev').innerHTML=ICON.prev; $('#next').innerHTML=ICON.next; $('#shuf').innerHTML=ICON.shuf; playBtn.innerHTML=ICON.play;
   fillR(seek);
   applyTheme(false); renderPresetSelect(''); buildSliders(); syncModes(); setBypassGains(true); update(); flushUpdate(); initUI(); fit();
-  // device setup is optional: Settings > Screen & Device Calibration
   requestAnimationFrame(frame);
   await store.init();
   try{ lib=await store.all(); }catch(e){ lib=[]; }
