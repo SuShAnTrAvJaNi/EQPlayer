@@ -936,7 +936,9 @@ function recompute(){
   grDb=0;
   if(state.auto&&!state.bypass){
     let peak=0; for(let k=0;k<NPTS;k++) if(curve[k]>peak) peak=curve[k];
-    grDb=Math.round(Math.min(15,Math.max(0,peak)*0.55)*10)/10;
+    // only boosts above +6 dB are trimmed, by half of the excess, and never more than 6 dB,
+    // so ordinary EQ moves keep their loudness
+    grDb=Math.round(Math.min(6,Math.max(0,peak-6)*0.5)*10)/10;
   }
   preNode.gain.setTargetAtTime(state.bypass?1:Math.pow(10,(state.pre-grDb)/20),ac.currentTime,0.03);
 }
