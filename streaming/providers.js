@@ -49,7 +49,7 @@
   const redirectUri = () => CFG.VITE_SPOTIFY_REDIRECT_URI || (location.origin + location.pathname);
 
   async function spotifyLogin() {
-    if (!spotifyConfigured()) throw new StreamError('not_configured', 'Add your Spotify client ID to config.js first.');
+    if (!spotifyConfigured()) throw new StreamError('not_configured', 'Enter your Spotify client ID in Settings first.');
     const verifier = randomB64(64);
     const state = randomB64(16);
     const challenge = b64url(new Uint8Array(await crypto.subtle.digest('SHA-256', new TextEncoder().encode(verifier))));
@@ -329,7 +329,7 @@
   }
 
   async function appleInstance() {
-    if (!appleConfigured()) throw new StreamError('not_configured', 'Add your Apple Music developer token to config.js first.');
+    if (!appleConfigured()) throw new StreamError('not_configured', 'Enter your Apple Music developer token in Settings first.');
     if (am) return am;
     if (!amReady) {
       amReady = loadMusicKit().then(() => {

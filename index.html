@@ -555,6 +555,16 @@ button:disabled,.mrow:disabled{opacity:.35;pointer-events:none}
 body.idle .orb,#stage:not(.np-open) #sPlayer .orb{animation-play-state:paused}
 #updBar{position:fixed;z-index:95;left:50%;transform:translateX(-50%);top:calc(var(--sat) + 10px);min-height:40px;padding:0 18px;border-radius:999px;background:var(--acc);color:#fff;font-weight:700}
 #updBar[hidden]{display:none}
+
+/* ---- Settings as a full-screen tab; smooth transitions; motion off ---- */
+@keyframes tabIn{from{opacity:0;transform:translateY(10px)}to{opacity:1;transform:none}}
+#menuWrap{position:absolute;inset:0;z-index:4;display:none;background:none}
+#menuWrap.show{display:block;animation:tabIn .38s var(--ease)}
+#menuBox{position:absolute;inset:0;width:auto;max-width:none;border:0;border-radius:0;box-shadow:none;background:none;backdrop-filter:none;-webkit-backdrop-filter:none;padding:calc(var(--sat) + 12px) calc(var(--sar) + 16px) calc(var(--sab) + var(--navH) + var(--miniH) + 34px) calc(var(--sal) + 16px);overflow:auto;-webkit-overflow-scrolling:touch;overscroll-behavior:contain}
+#menuBox h2{position:static;margin:0 0 6px;padding:0;background:none;font-size:34px;font-weight:800;letter-spacing:-.6px}
+#stage.menu-open #screens{display:none}
+#stage.t-library #sLibrary,#stage.t-eq #sEq,#stage.t-search #sSearch{animation:tabIn .38s var(--ease)}
+body.no-motion *,body.no-motion *::before,body.no-motion *::after{transition-duration:0s!important;transition-delay:0s!important;animation-duration:0s!important;animation-delay:0s!important}
 </style>
 </head>
 <body>
@@ -704,6 +714,9 @@ body.idle .orb,#stage:not(.np-open) #sPlayer .orb{animation-play-state:paused}
 
 <div id="menuWrap" role="dialog" aria-modal="true" aria-label="Settings"><div id="menuBox">
   <h2>Settings <button id="menuDone" class="on" style="min-height:36px">Done</button></h2>
+  <div class="msec"><span class="lab">Motion</span>
+    <button class="mrow sw-row" id="motTog" role="switch" aria-checked="true"><span>Smooth transitions<small>animated screens, sheets and artwork</small></span><i class="switch"></i></button>
+  </div>
   <div class="msec"><span class="lab">Accent Color Theme</span>
     <button class="mrow" id="themeBtn"><span>Colour theme</span><i class="swdot"></i></button>
   </div>
@@ -1202,6 +1215,7 @@ let curTab='library';
 const navBtns=[...document.querySelectorAll('#nav button')];
 function setTab(t){
   if(t==='menu'){ openMenu(); return; }
+  menuWrap.classList.remove('show'); stage.classList.remove('menu-open');
   closeNP(); closeQueue(); closeEqSheet(true);
   curTab=t;
   const cl=stage.classList;
@@ -1214,11 +1228,18 @@ navBtns.forEach(b=>b.onclick=()=>{ userNavigated=true; setTab(b.dataset.t); });
 const menuWrap=$('#menuWrap');
 function openMenu(){
   markSettingsSeen();
+  closeNP(); closeQueue(); closeEqSheet(true); closeMore();
+  stage.classList.add('menu-open');
   menuWrap.classList.add('show');
+  navBtns.forEach(b=>b.classList.toggle('act',b.dataset.t==='menu'));
 }
-function closeMenu(){ menuWrap.classList.remove('show'); }
+// going back returns to the tab the user came from (curTab never becomes 'menu')
+function closeMenu(){
+  if(!menuWrap.classList.contains('show')) return;
+  menuWrap.classList.remove('show'); stage.classList.remove('menu-open');
+  setTab(curTab);
+}
 $('#menuDone').onclick=closeMenu;
-menuWrap.addEventListener('pointerdown',e=>{ if(e.target===menuWrap) closeMenu(); });
 $('#autoM').onclick=()=>{ state.auto=!state.auto; update(); };
 stage.addEventListener('scroll',()=>{ stage.scrollTop=0; stage.scrollLeft=0; });
 const eqSec=$('#sEq');
@@ -2258,8 +2279,8 @@ lyrInner.addEventListener('click',e=>{
 /* ----- streaming: settings UI, import, and playback adapter ----- */
 function syncStreamUI(){
   const s=SP_.status();
-  $('#spS').textContent=!s.spotify.configured?'Set client ID in config.js':s.spotify.connected?'Connected · tap to sign out':'Not connected';
-  $('#amS').textContent=!s.apple.configured?'Set developer token in config.js':s.apple.connected?'Connected · tap to sign out':'Not connected';
+  $('#spS').textContent=!s.spotify.configured?'Enter the client ID below':s.spotify.connected?'Connected · tap to sign out':'Not connected';
+  $('#amS').textContent=!s.apple.configured?'Enter the token below':s.apple.connected?'Connected · tap to sign out':'Not connected';
   $('#spImp').disabled=!s.spotify.connected;
   $('#amImp').disabled=!s.apple.connected;
 }
@@ -2577,7 +2598,15 @@ function initShell(){
   syncPlayState(); syncFav(); drawWave();
 }
 
+const motTog=$('#motTog');
+function applyMotion(){
+  const on=prefs.motion!==false;
+  document.body.classList.toggle('no-motion',!on);
+  motTog.setAttribute('aria-checked',on?'true':'false'); motTog.querySelector('.switch').classList.toggle('on',on);
+}
+motTog.onclick=()=>{ prefs.motion=prefs.motion===false; savePrefs(); applyMotion(); };
 function initGlue(){
+  applyMotion();
   initShell();
   syncLyrUI();
   syncStreamUI();
