@@ -212,10 +212,13 @@
   }
 
   async function lookupLrclib(meta, sig) {
-    const base = { track_name: meta.title, artist_name: meta.artist || '' };
+    // "Song - 2012 Remaster" and "Song (Live)" are usually listed under the plain title
+    const clean = String(meta.title || '').replace(/\s+[-–]\s+.*\b(remaster(ed)?|live|mono|stereo|version)\b.*$/i, '').replace(/\s*\((remaster(ed)?|live)[^)]*\)\s*$/i, '').trim();
+    const base = { track_name: clean || meta.title, artist_name: meta.artist || '' };
     let rec = null;
-    if (meta.album && meta.duration > 0) {
+    if (meta.album && meta.duration > 0 && meta.artist) {   // /get needs an artist; without one, go to /search
       rec = await fetchJson(LRCLIB + '/get?' + qs(Object.assign({}, base, { album_name: meta.album, duration: Math.round(meta.duration) })), sig);
+      if (rec && rec.instrumental) rec = null;   // instrumental entries have no words to show
     }
     if (!rec) {
       const list = await fetchJson(LRCLIB + '/search?' + qs(base), sig);
@@ -324,6 +327,7 @@
     if (worker) return worker;
     if (typeof Worker === 'undefined') throw new Error('Web Workers are not available in this browser.');
     worker = new Worker(WORKER_URL, { type: 'module' });
+    worker.onmessageerror = () => { if (typeof failWorker === 'function') failWorker(new Error('Worker message could not be read.')); };
     worker.onmessage = (e) => {
       const m = e.data || {};
       const p = pending.get(m.id);
@@ -368,6 +372,7 @@
     const onAbort = () => failWorker(abortError());
     if (sig) sig.addEventListener('abort', onAbort, { once: true });
     try {
+      throwIfAborted(sig);
       const pcm = await decodeTo16k(buf);
       throwIfAborted(sig);
       if (loadedModel !== WHISPER_MODEL) {
@@ -386,7 +391,7 @@
       for (let off = 0; off < pcm.length; off += CH) {
         throwIfAborted(sig);
         const slice = pcm.slice(off, Math.min(pcm.length, off + CH));  // copy, so the buffer can be transferred
-        const r = await call({ type: 'chunk', pcm: slice, offset: off / SAMPLE_RATE, multilingual, language: 'en' }, [slice.buffer]);
+        const r = await call({ type: 'chunk', pcm: slice, offset: off / SAMPLE_RATE, multilingual, language: multilingual ? undefined : 'en' }, [slice.buffer]);
         for (const s of r.segs || []) segs.push(s);
         if (opts.onProgress) opts.onProgress(Math.min(1, (off + CH) / pcm.length));
       }
@@ -438,7 +443,7 @@
 
     // Tier 3: optional local transcription (needs the file bytes, so never for streams)
     if (opts.allowAI && buf) {
-      if ((opts.duration || 0) > MAX_AI_SECONDS) { say('Track too long for AI transcription'); return none(); }
+      if (Math.max(opts.duration || 0, track.duration || 0) > MAX_AI_SECONDS) { say('Track too long for AI transcription'); return none(); }
       const key = 'ai|' + norm(track.name) + '|' + (track.size || 0);
       const c = await cache.get(key);
       if (c && (c.found || Date.now() - c.ts < MISS_TTL)) return c.found ? ok('synced', c.lines, 'ai') : none();

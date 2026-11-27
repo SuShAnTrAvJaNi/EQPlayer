@@ -15,7 +15,7 @@
 <style>
 :root{--bg:#121212;--card:#181818;--card2:#222;--well:#0b0b0b;--line:#2c2c2c;--line2:#3a3a3a;--txt:#eceff1;--mut:#8a8a8a;--dim:#5c5c5c;--acc:#ffa000;--mid:#ffb300;--hi:#ffca28;--edge:#ffc247;--ink:#1a0f00;--dk:#2a1b00;--deep:#c66900;--rgb:255,160,0;--acc2:#ff8f00;--glow:rgba(255,160,0,.45);--neg:#ff7043;--bad:#ff5252;--kn:60px}
 *{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
-html,body{margin:0;height:100vh;height:100dvh;width:100%;overflow:hidden;position:fixed;inset:0;background:var(--bg);color:var(--txt);color-scheme:dark;font:15px/1.35 -apple-system,BlinkMacSystemFont,"SF Pro Text",system-ui,sans-serif;-webkit-user-select:none;user-select:none}
+html,body{margin:0;height:100vh;height:100dvh;-webkit-user-select:text;user-select:text;width:100%;overflow:hidden;position:fixed;inset:0;background:var(--bg);color:var(--txt);color-scheme:dark;font:15px/1.35 -apple-system,BlinkMacSystemFont,"SF Pro Text",system-ui,sans-serif;-webkit-user-select:none;user-select:none}
 #stage{position:fixed;inset:0;--knb:92px}
 
 /* carbon / brushed hardware plates */
@@ -329,7 +329,7 @@ html,body{font-family:-apple-system,BlinkMacSystemFont,"SF Pro Display","SF Pro 
 
 /* glass surfaces */
 #nav,#mini,#morePop,.cbtn,#menuBox,#themeBox,#modal .box,#toast,.dock button,#qSheet{background:rgba(28,28,32,.56);-webkit-backdrop-filter:blur(48px) saturate(190%);backdrop-filter:blur(48px) saturate(190%);border:.5px solid rgba(255,255,255,.18);box-shadow:inset 0 1px 0 rgba(255,255,255,.22),0 12px 32px rgba(0,0,0,.34)}
-button,select,.btn{background:rgba(255,255,255,.1);border:.5px solid rgba(255,255,255,.14);border-radius:12px;box-shadow:inset 0 1px 0 rgba(255,255,255,.16);color:#fff}
+button,select,.btn{-webkit-user-select:none;user-select:none;background:rgba(255,255,255,.1);border:.5px solid rgba(255,255,255,.14);border-radius:12px;box-shadow:inset 0 1px 0 rgba(255,255,255,.16);color:#fff}
 button.on,.btn.primary{background:var(--acc);color:#fff;border-color:transparent;box-shadow:inset 0 1px 0 rgba(255,255,255,.3),0 6px 18px rgba(var(--rgb),.35)}
 button.tog.on{background:rgba(var(--rgb),.22);color:var(--acc);border-color:rgba(var(--rgb),.5);box-shadow:none}
 #ab.off{background:rgba(255,69,58,.18);color:#ff6961;border-color:rgba(255,69,58,.5)}
@@ -409,7 +409,7 @@ select{background-color:rgba(255,255,255,.1)}
 @keyframes mq{0%,14%{transform:translateX(0)}86%,100%{transform:translateX(var(--mq))}}
 #sPlayer .artist{font-size:20px;font-weight:400;color:rgba(255,255,255,.62);max-width:100%;overflow:hidden;white-space:nowrap;text-overflow:ellipsis}
 #sPlayer .sub{display:none}
-.cbtn{width:36px;height:36px;min-height:36px;padding:0;border-radius:50%;flex:none;color:#fff}
+.cbtn{width:44px;height:44px;min-height:44px;padding:0;border-radius:50%;flex:none;color:#fff}
 .cbtn svg{width:18px;height:18px}
 .cbtn.on{color:var(--acc);background:rgba(28,28,32,.56);border-color:rgba(255,255,255,.18);box-shadow:inset 0 1px 0 rgba(255,255,255,.22),0 12px 32px rgba(0,0,0,.34)}
 
@@ -494,7 +494,7 @@ select{background-color:rgba(255,255,255,.1)}
 .qh{width:44px;height:44px;flex:none;display:flex;align-items:center;justify-content:center;color:rgba(255,255,255,.5);touch-action:none;cursor:grab}
 .qh svg{width:22px;height:22px}
 .qx{width:40px;min-height:40px;height:40px;padding:0;border:0;background:transparent;box-shadow:none;color:rgba(255,255,255,.45)}
-@media (hover:none){.qx{display:none}}
+
 
 /* EQ & DSP: tab + sheet */
 #sEq{position:relative}
@@ -676,7 +676,7 @@ body.idle .orb,#stage:not(.np-open) #sPlayer .orb{animation-play-state:paused}
 
 <section class="screen card" id="sSearch">
   <h1 class="ltitle">Search</h1>
-  <div class="row"><input type="search" id="search" placeholder="Search songs, artists, albums" autocomplete="off" autocorrect="off" autocapitalize="off"></div>
+  <div class="row"><input type="search" id="search" aria-label="Search songs" placeholder="Search songs, artists, albums" autocomplete="off" autocorrect="off" autocapitalize="off"></div>
   <div class="list" id="slist"><div class="empty">Type to search your library</div></div>
 </section>
 
@@ -688,7 +688,7 @@ body.idle .orb,#stage:not(.np-open) #sPlayer .orb{animation-play-state:paused}
   <button data-t="search"><svg class="s" viewBox="0 0 24 24"><circle cx="10.500" cy="10.500" r="6.500"/><line x1="15.500" y1="15.500" x2="21" y2="21"/></svg><span>Search</span></button>
   <button data-t="menu"><svg class="s" viewBox="0 0 24 24"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg><span>Settings</span><i class="dot" id="setDot" hidden></i></button>
 </nav>
-<div id="mini" role="button" tabindex="0" aria-label="Open Now Playing"><div id="miniArt"></div><div class="mi"><div class="mt" id="miniT">Not playing</div><div class="ma" id="miniA">&nbsp;</div></div><button id="miniPlay" aria-label="Play or pause"></button><button id="miniNext" aria-label="Next"></button></div>
+<div id="mini"><div id="miniArt"></div><div class="mi" role="button" tabindex="0" aria-label="Open Now Playing"><div class="mt" id="miniT">Not playing</div><div class="ma" id="miniA">&nbsp;</div></div><button id="miniPlay" aria-label="Play or pause"></button><button id="miniNext" aria-label="Next"></button></div>
 <div id="qSheet" role="dialog" aria-modal="true" aria-label="Up Next" aria-hidden="true">
   <div class="qgrab" id="qGrab" aria-hidden="true"><i></i></div>
   <div class="qhead"><h2>Up Next</h2><button id="shuf" class="tog" aria-label="Shuffle"></button><button id="rep" class="tog" aria-label="Repeat"></button><button id="qDone" class="on">Done</button></div>
@@ -702,7 +702,7 @@ body.idle .orb,#stage:not(.np-open) #sPlayer .orb{animation-play-state:paused}
   <button id="rmCur" role="menuitem" class="danger">Remove from library</button>
 </div>
 
-<div id="menuWrap"><div id="menuBox">
+<div id="menuWrap" role="dialog" aria-modal="true" aria-label="Settings"><div id="menuBox">
   <h2>Settings <button id="menuDone" class="on" style="min-height:36px">Done</button></h2>
   <div class="msec"><span class="lab">Accent Color Theme</span>
     <button class="mrow" id="themeBtn"><span>Colour theme</span><i class="swdot"></i></button>
@@ -720,8 +720,8 @@ body.idle .orb,#stage:not(.np-open) #sPlayer .orb{animation-play-state:paused}
     <button class="mrow" id="spBtn"><span>Spotify</span><small id="spS">Not connected</small></button>
     <button class="mrow" id="amBtn"><span>Apple Music</span><small id="amS">Not connected</small></button>
     <div class="mrow" style="flex-direction:column;align-items:stretch;gap:6px">
-      <input id="cfgSp" placeholder="Spotify Client ID" autocomplete="off" style="width:100%">
-      <input id="cfgAm" placeholder="Apple developer token" autocomplete="off" style="width:100%">
+      <input id="cfgSp" aria-label="Spotify Client ID" placeholder="Spotify Client ID" autocomplete="off" style="width:100%">
+      <input id="cfgAm" aria-label="Apple developer token" placeholder="Apple developer token" autocomplete="off" style="width:100%">
       <button id="cfgSave">Save keys on this device</button>
     </div>
     <script>
@@ -753,12 +753,12 @@ body.idle .orb,#stage:not(.np-open) #sPlayer .orb{animation-play-state:paused}
   </div>
 </div></div>
 
-<div id="themeWrap"><div id="themeBox">
+<div id="themeWrap" role="dialog" aria-modal="true" aria-label="Colour theme"><div id="themeBox">
   <h2>Colour theme <button id="themeDone" class="on" style="min-height:36px">Done</button></h2>
   <span class="lab">Colour</span>
-  <div class="spec" id="specH"><div class="sthumb"></div></div>
+  <div class="spec" id="specH" role="slider" tabindex="0" aria-label="Colour" aria-valuemin="0" aria-valuemax="360"><div class="sthumb"></div></div>
   <span class="lab">Intensity</span>
-  <div class="spec" id="specS"><div class="sthumb"></div></div>
+  <div class="spec" id="specS" role="slider" tabindex="0" aria-label="Intensity" aria-valuemin="0" aria-valuemax="100"><div class="sthumb"></div></div>
   <div class="tprev"></div>
   <div class="swrow" id="swatches"></div>
   <button id="themeReset">Reset to Apple Music red</button>
@@ -768,7 +768,7 @@ body.idle .orb,#stage:not(.np-open) #sPlayer .orb{animation-play-state:paused}
   <div class="btns"><button id="mCancel">Cancel</button><button id="mOk" class="on">OK</button></div>
 </div></div>
 <button id="updBar" hidden>Update available. Tap to reload.</button>
-<div id="toast"></div>
+<div id="toast" role="status" aria-live="polite"></div>
 </div>
 
 
@@ -805,14 +805,14 @@ function validState(s){
 }
 let state=ls.get('eqp-v4',null);
 if(!validState(state)) state={gains:Array(NB).fill(0),pre:0,auto:true,bypass:false,bass:0,treble:0};
-else { state.gains=state.gains.map(g=>clamp(g,-GMAX,GMAX)); state.pre=+state.pre||0; state.auto=state.auto!==false; state.bypass=!!state.bypass; state.bass=clamp(+state.bass||0,-GMAX,GMAX); state.treble=clamp(+state.treble||0,-GMAX,GMAX); }
+else { state.gains=state.gains.map(g=>clamp(g,-GMAX,GMAX)); state.pre=clamp(isFinite(+state.pre)?+state.pre:0,-24,6); state.auto=state.auto!==false; state.bypass=!!state.bypass; state.bass=clamp(+state.bass||0,-GMAX,GMAX); state.treble=clamp(+state.treble||0,-GMAX,GMAX); }
 const REV_TYPES=['Off','Room','Auditorium','Great Hall','Stadium'];
 state.bal=clamp(+state.bal||0,-100,100);
 state.width=isFinite(+state.width)&&state.width!=null?clamp(+state.width,0,200):100;
 state.revType=REV_TYPES.includes(state.revType)?state.revType:'Off';
 state.revMix=isFinite(+state.revMix)&&state.revMix!=null?clamp(+state.revMix,0,100):35;
 let customPresets=ls.get('eqp-presets10',{});
-if(!customPresets||typeof customPresets!=='object') customPresets={};
+if(!customPresets||typeof customPresets!=='object'||Array.isArray(customPresets)) customPresets={};
 const prefs=Object.assign({vol:1,shuffle:false,repeat:0,viz:'bars',eqm:'sl'},ls.get('eqp-prefs',{}));
 let _spT=0, _ssT=0;
 const savePrefs=()=>{ clearTimeout(_spT); _spT=setTimeout(()=>ls.set('eqp-prefs',prefs),350); };
@@ -887,7 +887,7 @@ function applyFx(){
   wGain.gain.setTargetAtTime(state.width/100,t,0.02);
   if(state.revType!==curRev){
     curRev=state.revType;
-    if(curRev!=='Off'){ if(!impCache[curRev]) impCache[curRev]=makeImpulse(curRev); revConv.buffer=impCache[curRev]; }
+    if(curRev!=='Off'){ if(!impCache[curRev]) impCache[curRev]=makeImpulse(curRev); revConv.buffer=impCache[curRev]; } else { revConv.buffer=null; }
   }
   const m=state.revType==='Off'?0:state.revMix/100;
   revWet.gain.setTargetAtTime(m*0.9,t,0.03); revDry.gain.setTargetAtTime(1-m*0.25,t,0.03);
@@ -1093,7 +1093,7 @@ function syncUI(){
 abBtn.onclick=()=>{state.bypass=!state.bypass;setBypassGains();applying=true;update();applying=false;}; // A/B must not deselect the preset
 $('#auto').onclick=()=>{state.auto=!state.auto;update();};
 $('#reset').onclick=()=>{
-  state.gains=Array(NB).fill(0);state.pre=0;state.bass=0;state.treble=0;state.bal=0;state.width=100;state.auto=true;state.bypass=false;
+  state.gains=Array(NB).fill(0);state.pre=0;state.bass=0;state.treble=0;state.bal=0;state.width=100;state.auto=true;state.bypass=false;state.revType='Off';state.revMix=35;
   applying=true; setBypassGains(); update(); applying=false; renderPresetSelect('b:Flat');
 };
 
@@ -1122,7 +1122,7 @@ function applyPreset(v){
     state.gains=g.slice(); state.auto=true; state.bass=0; state.treble=0;
   }else{
     const p=customPresets[v.slice(2)]; if(!validState(p)){applying=false;return;}
-    state.gains=p.gains.map(x=>clamp(x,-GMAX,GMAX)); state.pre=typeof p.pre==='number'?p.pre:0; state.auto=!!p.auto; state.bass=typeof p.bass==='number'?clamp(p.bass,-GMAX,GMAX):0; state.treble=typeof p.treble==='number'?clamp(p.treble,-GMAX,GMAX):0;
+    state.gains=p.gains.map(x=>clamp(x,-GMAX,GMAX)); state.pre=typeof p.pre==='number'&&isFinite(p.pre)?clamp(p.pre,-24,6):0; state.auto=!!p.auto; state.bass=typeof p.bass==='number'?clamp(p.bass,-GMAX,GMAX):0; state.treble=typeof p.treble==='number'?clamp(p.treble,-GMAX,GMAX):0;
   }
   state.bypass=false;
   setBypassGains(); update();
@@ -1670,7 +1670,7 @@ function trackRow(t,i){
   d.innerHTML='<span class="num"><span class="n"></span><span class="eqb"><i></i><i></i><i></i></span></span><span class="info"><span class="t"></span><span class="a"></span></span><button class="rm" aria-label="Remove song">✕</button>';
   d.querySelector('.n').textContent=i+1;
   d.querySelector('.t').textContent=t.title;
-  d.querySelector('.a').textContent=(t.artist||'Unknown artist')+(isStreamTrack(t)?' · '+SRC_NAME[t.source]:'');
+  d.querySelector('.a').textContent=(t.artist||'Unknown artist')+(isStreamTrack(t)?' · '+(SRC_NAME[t.source]||'Streaming'):'');
   return d;
 }
 const groupKey=(t,kind)=>kind==='albums'?(t.album||'Unknown album'):(t.artist||'Unknown artist');
@@ -1701,7 +1701,7 @@ function renderLibList(){
 function renderSearch(){
   const q=filter.trim().toLowerCase(); searchEl.innerHTML=''; searchIds=[];
   if(!q){ searchEl.innerHTML='<div class="empty">Type to search your library</div>'; return; }
-  const v=lib.filter(t=>(t.title+' '+t.artist+' '+t.album+' '+t.name).toLowerCase().includes(q));
+  const v=lib.filter(t=>[t.title,t.artist,t.album,t.name].map(x=>x||'').join(' ').toLowerCase().includes(q));
   if(!v.length){ searchEl.innerHTML='<div class="empty">No songs match your search</div>'; return; }
   const frag=document.createDocumentFragment();
   v.forEach((t,i)=>{ searchIds.push(t.id); frag.appendChild(trackRow(t,i)); });
@@ -1776,10 +1776,13 @@ const MESH_DEF=['#fa243c','#7a3cff','#ff7a45','#2a64ff'];
 function meshSet(c){ const st=document.documentElement.style; for(let i=0;i<4;i++) st.setProperty('--o'+(i+1),c[i]||MESH_DEF[i]); }
 function rgb2hsl(r,g,b){ r/=255;g/=255;b/=255; const mx=Math.max(r,g,b), mn=Math.min(r,g,b), l=(mx+mn)/2, d=mx-mn; let h=0,sa=0;
   if(d){ sa=l>.5?d/(2-mx-mn):d/(mx+mn); h=mx===r?((g-b)/d+(g<b?6:0)):mx===g?((b-r)/d+2):((r-g)/d+4); h*=60; } return [h,sa,l]; }
+let meshTok=0;
 function meshFrom(url){
+  const tok=++meshTok;
   if(!url){ meshSet(MESH_DEF); return; }
   const img=new Image(); img.crossOrigin='anonymous';
   img.onload=()=>{
+    if(tok!==meshTok) return;
     try{
       const c=document.createElement('canvas'); c.width=c.height=32;
       const x=c.getContext('2d',{willReadFrequently:true}); x.drawImage(img,0,0,32,32);
@@ -1795,7 +1798,7 @@ function meshFrom(url){
       meshSet(top);
     }catch(e){ meshSet(MESH_DEF); }
   };
-  img.onerror=()=>meshSet(MESH_DEF);
+  img.onerror=()=>{ if(tok===meshTok) meshSet(MESH_DEF); };
   img.src=url;
 }
 function paintArt(url){
@@ -1869,14 +1872,15 @@ function stopCurrent(){
   loadToken++; if(SX.active()) SX.stop(); audio.pause(); audio.removeAttribute('src'); audio.load(); lyrCancel(); lyrSetLines([],false); lyrShow('');
   if(curUrl){URL.revokeObjectURL(curUrl);curUrl=null;}
   curId=null; srcId=null; ls.set('eqp-last',null); renderNow(null); markCurrent();
+  if('mediaSession' in navigator){ try{ navigator.mediaSession.metadata=null; }catch(e){} }
 }
 function nextId(dir){
   if(!queue.length) return null;
   let i=queue.indexOf(curId);
-  if(prefs.shuffle&&queue.length>1){ let r; do{r=Math.floor(Math.random()*queue.length);}while(r===i); return queue[r]; }
+  if(prefs.shuffle&&dir>0&&queue.length>1){ let r; do{r=Math.floor(Math.random()*queue.length);}while(r===i); return queue[r]; }
   if(i<0) i=dir>0?-1:queue.length;
   const n=i+dir;
-  if(n<0) return queue[0];
+  if(n<0) return prefs.repeat===1?queue[queue.length-1]:queue[0];
   if(n>=queue.length) return prefs.repeat===1?queue[0]:null;
   return queue[n];
 }
@@ -1891,6 +1895,7 @@ $('#files').onchange=async e=>{
   const lrcMap=new Map(all.filter(f=>/\.lrc$/i.test(f.name)).map(f=>[stemOf(f.name),f]));
   e.target.value='';
   if(files.length) await addFiles(files,lrcMap);
+  else if(lrcMap.size) toast('Add the matching MP3 together with its .lrc file',3800);
 };
 async function addFiles(files,lrcMap){
   if(busyAdding){ toast('Still adding songs…'); return; }
@@ -1922,24 +1927,25 @@ async function addFiles(files,lrcMap){
   if(skipped) msg+=(msg?' · ':'')+skipped+' already in library';
   if(failed) msg+=(msg?' · ':'')+failed+' could not be saved';
   if(full) msg='Storage is full. Remove some songs and try again.'+(added.length?' ('+added.length+' added)':'');
+  if(!store.persistent&&added.length) msg+=(msg?' · ':'')+'Not saved on this device';
   if(msg) toast(msg,3800);
-  if(!store.persistent&&added.length) toast('Saving is unavailable here, so songs will be forgotten when you close the app.',5000);
   if(curId==null&&added.length){ loadTrack(added[0],{play:true}); }
 }
 function askRemove(id){
   const t=byId(id); if(!t) return;
   showModal({title:'Remove song',text:'Remove “'+t.title+'” from the app? Your original file is not touched.',ok:'Remove',danger:true,onOk:async()=>{
     try{ await store.del(id); }catch(e){ toast('Could not remove it'); return; }
-    lib=lib.filter(x=>x.id!==id); queue=queue.filter(x=>x!==id);
+    lib=lib.filter(x=>x.id!==id); queue=queue.filter(x=>x!==id); if(favs.delete(id)) ls.set('eqp-favs',[...favs]);
     if(curId===id) stopCurrent();
     syncQueue(); renderList(); updateStorage();
   }});
 }
 $('#clear').onclick=()=>{
   if(!lib.length){ toast('The library is already empty'); return; }
+  if(busyAdding){ toast('Wait for the songs to finish adding'); return; }
   showModal({title:'Clear all songs',text:'Remove all '+lib.length+' songs from the app and free the space? Your original files are not touched.',ok:'Clear all',danger:true,onOk:async()=>{
     try{ await store.clear(); }catch(e){ toast('Could not clear the library'); return; }
-    stopCurrent(); lib=[]; queue=[]; renderList(); updateStorage(); toast('Library cleared');
+    stopCurrent(); lib=[]; queue=[]; qsrc='all'; favs.clear(); ls.set('eqp-favs',[]); renderList(); updateStorage(); toast('Library cleared');
   }});
 };
 async function updateStorage(){
@@ -2024,7 +2030,7 @@ const shufBtn=$('#shuf'), repBtn=$('#rep');
 function syncModes(){ shufBtn.classList.toggle('on',prefs.shuffle); repBtn.classList.toggle('on',prefs.repeat>0); repBtn.innerHTML=prefs.repeat===2?ICON.rep1:ICON.rep; }
 shufBtn.onclick=()=>{prefs.shuffle=!prefs.shuffle;savePrefs();syncModes();};
 repBtn.onclick=()=>{prefs.repeat=(prefs.repeat+1)%3;savePrefs();syncModes();};
-audio.addEventListener('play',()=>{playBtn.innerHTML=ICON.pause;markCurrent();liveUntil=0;vizDirty=true;});
+audio.addEventListener('play',()=>{cancelSleepFade();playBtn.innerHTML=ICON.pause;markCurrent();liveUntil=0;vizDirty=true;});
 audio.addEventListener('pause',()=>{playBtn.innerHTML=ICON.play;markCurrent();savePos();liveUntil=performance.now()+4200;});
 audio.addEventListener('ended',()=>{
   if(unlocking) return;
@@ -2037,7 +2043,7 @@ function repeatOne(){ if(prefs.repeat===2){audio.currentTime=0;audio.play().catc
 audio.addEventListener('loadedmetadata',()=>{
   drawWave(); lyrTryStart();
   if(pendingPos>0&&isFinite(audio.duration)){ try{audio.currentTime=Math.min(pendingPos,Math.max(0,audio.duration-1));}catch(e){} }
-  pendingPos=0;
+  if(isFinite(audio.duration)) pendingPos=0;
 });
 audio.addEventListener('timeupdate',()=>{
   if(!seeking){ $('#cur').textContent=fmtTime(audio.currentTime); if(audio.duration) setSeek(Math.round(audio.currentTime/audio.duration*1000)); }
@@ -2070,20 +2076,22 @@ sleepSel.onchange=()=>{
   sleepTick=setInterval(checkSleep,1000); checkSleep();
   toast('Playback will stop in '+m+' minutes');
 };
+let sleepFadeT=0;
+function cancelSleepFade(){ if(!sleepFadeT) return; clearTimeout(sleepFadeT); sleepFadeT=0; volNode.gain.cancelScheduledValues(ac.currentTime); volNode.gain.setTargetAtTime(userGain(),ac.currentTime,0.02); }
 function checkSleep(){
   if(!sleepEnd) return;
   const left=sleepEnd-Date.now();
   if(left<=0){
     sleepEnd=0; clearInterval(sleepTick); sleepTick=null; sleepSel.value='0'; sleepLeft.textContent=''; syncSleepBtn();
     const t=ac.currentTime; volNode.gain.cancelScheduledValues(t); volNode.gain.setTargetAtTime(0,t,0.7);
-    setTimeout(()=>{ audio.pause(); if(SX.active()) SX.pause(); volNode.gain.cancelScheduledValues(ac.currentTime); volNode.gain.setTargetAtTime(userGain(),ac.currentTime,0.02); toast('Sleep timer: stopped'); },2400);
+    sleepFadeT=setTimeout(()=>{ sleepFadeT=0; audio.pause(); if(SX.active()) SX.pause(); volNode.gain.cancelScheduledValues(ac.currentTime); volNode.gain.setTargetAtTime(userGain(),ac.currentTime,0.02); toast('Sleep timer: stopped'); },2400);
     return;
   }
   const s=Math.ceil(left/1000); sleepLeft.textContent=Math.floor(s/60)+':'+String(s%60).padStart(2,'0');
 }
 
 function syncSleepBtn(){ $('#sleepBtn').classList.toggle('on',+sleepSel.value>0); }
-{ const oc=sleepSel.onchange; sleepSel.onchange=()=>{ oc(); syncSleepBtn(); }; }
+{ const oc=sleepSel.onchange; sleepSel.onchange=()=>{ cancelSleepFade(); oc(); syncSleepBtn(); }; }
 $('#sleepBtn').onclick=()=>{ const o=['0','15','30','60'], i=o.indexOf(sleepSel.value); sleepSel.value=o[(i+1)%o.length]; sleepSel.onchange(); };
 const catKey=id=>{ const t=byId(id); return t?(t.album||t.artist||''):''; };
 function jumpCat(dir){
@@ -2388,6 +2396,7 @@ function openNP(){
 }
 function closeNP(){
   if(!stage.classList.contains('np-open')) return;
+  if(npEl.contains(document.activeElement)) document.activeElement.blur();
   stage.classList.remove('np-open'); npEl.setAttribute('aria-hidden','true'); closeMore(); closeEqSheet(true); closeQueue();
 }
 (function(){
@@ -2398,7 +2407,8 @@ function closeNP(){
   miniEl.addEventListener('pointerup',()=>{ y0=null; });
   miniEl.addEventListener('pointercancel',()=>{ y0=null; });
   miniEl.addEventListener('click',e=>{ if(e.target.closest('button')||moved){ moved=false; return; } openNP(); });
-  miniEl.addEventListener('keydown',e=>{ if((e.key==='Enter'||e.key===' ')&&e.target===miniEl){ e.preventDefault(); openNP(); } });
+  miniEl.querySelector('#miniArt').addEventListener('click',()=>openNP());
+  miniEl.querySelector('.mi').addEventListener('keydown',e=>{ if(e.key==='Enter'||e.key===' '){ e.preventDefault(); openNP(); } });
   // grabber: tap or drag down to collapse
   const g=$('#grab'); let sy=null, dy=0;
   g.addEventListener('pointerdown',e=>{ sy=e.clientY; dy=0; npEl.style.transition='none'; try{g.setPointerCapture(e.pointerId);}catch(_){} });
@@ -2455,17 +2465,17 @@ function closeEqSheet(instant){
 }
 /* pull the EQ sheet down by its header to close it */
 (function(){
-  const el=$('#sEq'); let sy=null, dy=0, drag=false;
+  const el=$('#sEq'); let sy=null, sx=0, dy=0, drag=false;
   // a downward drag from the top of the sheet (header, grabber or the buttons above the controls) closes it
   el.addEventListener('pointerdown',e=>{
     if(e.target.closest('input,select,canvas,.bt,.pill')||el.scrollTop>0) return;
     if(e.clientY-el.getBoundingClientRect().top>150) return;
-    sy=e.clientY; dy=0; drag=false;
+    sy=e.clientY; sx=e.clientX; dy=0; drag=false;
   });
   el.addEventListener('pointermove',e=>{
     if(sy==null) return;
     const d=e.clientY-sy;
-    if(!drag){ if(d<12) return; if(Math.abs(e.clientX-(el._sx||e.clientX))>d) { sy=null; return; } drag=true; el.style.transition='none'; try{el.setPointerCapture(e.pointerId);}catch(_){} }
+    if(!drag){ if(d<12) return; if(Math.abs(e.clientX-sx)>d) { sy=null; return; } drag=true; el.style.transition='none'; try{el.setPointerCapture(e.pointerId);}catch(_){} }
     dy=Math.max(0,d); el.style.transform='translateY('+dy+'px)';
   });
   const end=()=>{ if(sy==null&&!drag) return; const d=dy, was=drag; sy=null; dy=0; drag=false; el.style.transition=''; el.style.transform=''; if(was&&d>90) closeEqSheet(); };
@@ -2538,7 +2548,7 @@ $('#qBtn').onclick=openQueue; $('#qDone').onclick=closeQueue;
     const dx=e.clientX-x0, dy=e.clientY-y0, r=row, m=mode; row=null; mode=null;
     if(m==='swipe'){
       const fg=r.querySelector('.qfg');
-      if(dx<-100){ fg.style.transform='translateX(-110%)'; setTimeout(()=>qRemoveAt(idx0),150); }
+      if(dx<-100){ fg.style.transform='translateX(-110%)'; const id0=queue[idx0]; setTimeout(()=>{ const i=queue.indexOf(id0); if(i>=0) qRemoveAt(i); },150); }
       else fg.style.transform='';
       setTimeout(()=>{ delete r.dataset.swiped; },60);
     } else if(m==='drag'){
@@ -2552,6 +2562,9 @@ $('#qBtn').onclick=openQueue; $('#qDone').onclick=closeQueue;
 })();
 document.addEventListener('keydown',e=>{
   if(e.key!=='Escape') return;
+  if(modal.classList.contains('show')){ hideModal(); return; }
+  if($('#themeWrap').classList.contains('show')){ $('#themeWrap').classList.remove('show'); return; }
+  if(menuWrap.classList.contains('show')){ closeMenu(); return; }
   if(qSheet.classList.contains('show')) closeQueue();
   else if(!morePop.hidden) closeMore();
   else if(stage.classList.contains('eq-sheet')) closeEqSheet();
@@ -2575,7 +2588,7 @@ function initGlue(){
 /* ---------- start-up ---------- */
 async function init(){
   try{ if(navigator.storage&&navigator.storage.persist) navigator.storage.persist(); }catch(e){}
-  try{ if('serviceWorker' in navigator && /^https?:/.test(location.protocol)) navigator.serviceWorker.register('sw.js').then(reg=>{
+  try{ if('serviceWorker' in navigator && /^https?:/.test(location.protocol)) navigator.serviceWorker.register('sw.js').catch(()=>{}).then(reg=>{ if(!reg) return;
     const offer=w=>{ const b=$('#updBar'); b.hidden=false; b.onclick=()=>{ b.disabled=true; b.textContent='Updating...'; navigator.serviceWorker.addEventListener('controllerchange',()=>location.reload(),{once:true}); w.postMessage('skip'); }; };
     if(reg.waiting&&navigator.serviceWorker.controller) offer(reg.waiting);
     reg.addEventListener('updatefound',()=>{ const w=reg.installing; if(w) w.addEventListener('statechange',()=>{ if(w.state==='installed'&&navigator.serviceWorker.controller) offer(w); }); });

@@ -28,7 +28,7 @@ self.onmessage = async (e) => {
     if (m.type === 'chunk') {
       if (!pipe) throw new Error('The speech model is not loaded.');
       const opts = { return_timestamps: true };
-      if (m.multilingual) { opts.language = m.language || 'en'; opts.task = 'transcribe'; }
+      if (m.multilingual) { if (m.language) opts.language = m.language; opts.task = 'transcribe'; }   // no language: Whisper auto-detects
       const out = await pipe(m.pcm, opts);
       const segs = (out.chunks || []).map((c) => ({
         t: m.offset + (c.timestamp && c.timestamp[0] ? c.timestamp[0] : 0),

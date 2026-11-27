@@ -28,8 +28,8 @@
 
   /* ---------- events ---------- */
   const listeners = { state: new Set(), error: new Set() };
-  const emit = (ev, data) => listeners[ev].forEach((fn) => { try { fn(data); } catch (e) { /* keep others running */ } });
-  const on = (ev, fn) => { listeners[ev].add(fn); return () => listeners[ev].delete(fn); };
+  const emit = (ev, data) => (listeners[ev] || new Set()).forEach((fn) => { try { fn(data); } catch (e) { /* keep others running */ } });
+  const on = (ev, fn) => { if (!listeners[ev]) listeners[ev] = new Set(); listeners[ev].add(fn); return () => listeners[ev].delete(fn); };
 
   /* ---------- stored auth (tokens live in localStorage: see the security note in the README) ---------- */
   const readAuth = () => { try { return JSON.parse(localStorage.getItem(KEY)) || {}; } catch (e) { return {}; } };
@@ -88,11 +88,18 @@
     writeAuth(a);
   }
 
+  let refreshing = null;
   async function spotifyToken(force) {
     const sp = readAuth().spotify;
     if (!sp || !sp.refresh) throw new StreamError('not_connected', 'Connect Spotify in Settings first.');
     if (!force && sp.exp > Date.now()) return sp.access;
-    saveSpotify(await tokenRequest({ grant_type: 'refresh_token', refresh_token: sp.refresh }));
+    // one refresh at a time: parallel refreshes would invalidate each other under refresh-token rotation
+    if (!refreshing) {
+      refreshing = tokenRequest({ grant_type: 'refresh_token', refresh_token: sp.refresh })
+        .then((tok) => { saveSpotify(tok); refreshing = null; })
+        .catch((e) => { refreshing = null; throw e; });
+    }
+    await refreshing;
     return readAuth().spotify.access;
   }
 
@@ -117,8 +124,8 @@
     const url = /^https?:/.test(pathOrUrl) ? pathOrUrl : SPOTIFY_API + pathOrUrl;
     const r = await fetch(url, { headers: { Authorization: 'Bearer ' + tok } });
     if (r.status === 401 && !retried) { await spotifyToken(true); return spGet(pathOrUrl, true); }
-    if (r.status === 403) throw new StreamError('forbidden', 'Spotify does not return items for this playlist.');
-    if (r.status === 429) throw new StreamError('rate_limited', 'Spotify is rate-limiting requests. Try again in a minute.');
+    if (r.status === 403) throw new StreamError('forbidden', 'Spotify refused this request (403). The playlist may be private or not shared with your account.');
+    if (r.status === 429) { const wait = Math.ceil(+r.headers.get('Retry-After') || 60); throw new StreamError('rate_limited', 'Spotify is rate-limiting requests. Try again in ' + wait + ' seconds.'); }
     if (!r.ok) throw new StreamError('api', 'Spotify request failed (' + r.status + ').');
     return r.json();
   }
@@ -285,17 +292,25 @@
   let am = null;
   let amReady = null;
 
+  // one in-flight load shared by every caller; a failed load can be retried
+  let musickitLoading = null;
   function loadMusicKit() {
     if (g.MusicKit) return Promise.resolve();
-    return new Promise((resolve, reject) => {
-      const timer = setTimeout(() => reject(new StreamError('sdk_unavailable', 'MusicKit did not load.')), 15000);
-      document.addEventListener('musickitloaded', () => { clearTimeout(timer); resolve(); }, { once: true });
+    if (musickitLoading) return musickitLoading;
+    musickitLoading = new Promise((resolve, reject) => {
+      const onLoaded = () => { clearTimeout(timer); resolve(); };
+      const timer = setTimeout(() => {
+        document.removeEventListener('musickitloaded', onLoaded);
+        reject(new StreamError('sdk_unavailable', 'MusicKit did not load.'));
+      }, 15000);
+      document.addEventListener('musickitloaded', onLoaded, { once: true });
       const s = document.createElement('script');
       s.src = MUSICKIT_URL;
       s.async = true;
-      s.onerror = () => { clearTimeout(timer); reject(new StreamError('sdk_unavailable', 'Could not load Apple MusicKit.')); };
+      s.onerror = () => { clearTimeout(timer); document.removeEventListener('musickitloaded', onLoaded); reject(new StreamError('sdk_unavailable', 'Could not load Apple MusicKit.')); };
       document.head.appendChild(s);
-    });
+    }).catch((e) => { musickitLoading = null; throw e; });
+    return musickitLoading;
   }
 
   function onAppleState() {
@@ -398,7 +413,10 @@
       await mk.play();
       if (positionSec) await mk.seekToTime(positionSec);
     } catch (err) {
-      throw new StreamError('subscription_required', 'Apple Music could not play this track. An active subscription is required.');
+      // only a real subscription problem is reported as one; anything else is a playback failure
+      const msg = String((err && (err.message || err.name)) || '');
+      if (/subscri|not authori|authoriz|forbidden|403/i.test(msg)) throw new StreamError('subscription_required', 'Apple Music could not play this track. An active subscription is required.');
+      throw new StreamError('play_failed', 'Apple Music could not start this track. ' + (msg || 'Try again.'));
     }
   }
 
