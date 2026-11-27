@@ -459,6 +459,8 @@ select{background-color:rgba(255,255,255,.1)}
 .lyl{font-size:28px;font-weight:800;line-height:1.16;letter-spacing:-.4px;text-align:left;color:rgba(255,255,255,.42);transform-origin:left center;transition:color .3s ease,transform .3s ease,filter .3s ease;padding:7px 4px}
 .lyl.act{color:#fff;transform:scale(1.02)}
 .lyl.plain{font-size:20px;font-weight:600;filter:none!important}
+.lyl.tr{font-size:21px;font-weight:600;margin-top:-10px;color:rgba(255,255,255,.3)}
+.lyl.tr.act{color:rgba(255,255,255,.3)}
 #lyrMsg{font-size:20px}
 #lyrSync{position:absolute;right:6px;bottom:10px;min-height:34px;padding:0 16px;border-radius:999px;background:rgba(28,28,32,.7);-webkit-backdrop-filter:blur(30px);backdrop-filter:blur(30px);z-index:4}
 
@@ -2135,10 +2137,13 @@ const lyr={open:false,id:0,ac:null,req:null,lines:[],synced:false,els:[],idx:-1,
 function lyrShow(msg){ lyrMsg.textContent=msg||''; lyrMsg.hidden=!msg; lyrScroll.hidden=!!msg; }
 function lyrSetLines(lines,synced){
   lyr.lines=lines; lyr.synced=synced; lyr.idx=-1;
+  // lines with the same timestamp form one block (e.g. original + translation); the first line of the block is the sync target
+  lyr.grp=lines.map((l,i)=>(synced&&i>0&&lines[i-1].t===l.t)?null:i);
+  for(let i=0;i<lines.length;i++) if(lyr.grp[i]===null) lyr.grp[i]=lyr.grp[i-1];
   const frag=document.createDocumentFragment();
   lyr.els=lines.map((l,i)=>{
     const d=document.createElement('div');
-    d.className='lyl'+(synced?'':' plain');
+    d.className='lyl'+(synced?'':' plain')+(synced&&lyr.grp[i]!==i?' tr':'');
     d.textContent=l.text||'♪';
     if(synced) d.dataset.i=i;
     frag.appendChild(d);
@@ -2149,8 +2154,9 @@ function lyrSetLines(lines,synced){
 }
 function lyrBlur(ans){
   if(!lyr.synced) return;
+  const g=ans>=0?lyr.grp[ans]:-1;
   for(let i=0;i<lyr.els.length;i++){
-    const d=ans<0?3:Math.abs(i-ans);
+    const d=ans<0?3:Math.abs(lyr.grp[i]-g);
     lyr.els[i].style.filter=d===0?'':'blur('+(d===1?1:2.5)+'px)';
   }
 }
@@ -2165,6 +2171,7 @@ function lyrTick(force){
   const t=nowTime();
   let lo=0,hi=lyr.lines.length-1,ans=-1;
   while(lo<=hi){ const m=(lo+hi)>>1; if(lyr.lines[m].t<=t){ ans=m; lo=m+1; } else hi=m-1; }
+  if(ans>=0) ans=lyr.grp[ans];   // highlight the original line of a same-time block, not the translation after it
   if(ans===lyr.idx&&!force) return;
   if(lyr.els[lyr.idx]) lyr.els[lyr.idx].classList.remove('act');
   lyr.idx=ans;
