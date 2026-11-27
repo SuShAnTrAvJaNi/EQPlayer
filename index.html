@@ -2430,8 +2430,10 @@ $('#rmCur').onclick=()=>{ if(curId!=null) askRemove(curId); };
 
 /* Audio & EQ sheet: the EQ & DSP screen as a Liquid Glass sheet over Now Playing */
 let eqSheetT=0;
+let eqFromNP=false;
 function openEqSheet(){
   clearTimeout(eqSheetT);
+  eqFromNP=stage.classList.contains('np-open');
   stage.classList.add('eq-sheet'); vizDirty=true;
   requestAnimationFrame(()=>requestAnimationFrame(()=>{ stage.classList.add('eq-in'); sizeViz(); setTimeout(sizeViz,460); }));
 }
@@ -2439,9 +2441,29 @@ function closeEqSheet(instant){
   if(!stage.classList.contains('eq-sheet')) return;
   stage.classList.remove('eq-in');
   clearTimeout(eqSheetT);
+  // closing the EQ sheet never leaves Now Playing: if it was opened from the player, the player stays open
+  if(eqFromNP) stage.classList.add('np-open');
   if(instant){ stage.classList.remove('eq-sheet'); return; }
   eqSheetT=setTimeout(()=>stage.classList.remove('eq-sheet'),460);
 }
+/* pull the EQ sheet down by its header to close it */
+(function(){
+  const el=$('#sEq'); let sy=null, dy=0, drag=false;
+  // a downward drag from the top of the sheet (header, grabber or the buttons above the controls) closes it
+  el.addEventListener('pointerdown',e=>{
+    if(e.target.closest('input,select,canvas,.bt,.pill')||el.scrollTop>0) return;
+    if(e.clientY-el.getBoundingClientRect().top>150) return;
+    sy=e.clientY; dy=0; drag=false;
+  });
+  el.addEventListener('pointermove',e=>{
+    if(sy==null) return;
+    const d=e.clientY-sy;
+    if(!drag){ if(d<12) return; if(Math.abs(e.clientX-(el._sx||e.clientX))>d) { sy=null; return; } drag=true; el.style.transition='none'; try{el.setPointerCapture(e.pointerId);}catch(_){} }
+    dy=Math.max(0,d); el.style.transform='translateY('+dy+'px)';
+  });
+  const end=()=>{ if(sy==null&&!drag) return; const d=dy, was=drag; sy=null; dy=0; drag=false; el.style.transition=''; el.style.transform=''; if(was&&d>90) closeEqSheet(); };
+  el.addEventListener('pointerup',end); el.addEventListener('pointercancel',end);
+})();
 $('#npClose').onclick=closeNP;
 $('#eqBtn').onclick=openEqSheet;
 $('#eqDone').onclick=()=>closeEqSheet();
