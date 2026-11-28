@@ -1755,7 +1755,7 @@ function playFrom(e,ids,src){
   const row=e.target.closest('.track'); if(!row||row.classList.contains('grp')) return;
   const id=+row.dataset.id;
   if(e.target.closest('.rm')){ e.stopPropagation(); askRemove(id); return; }
-  ensureUnlocked(); queue=ids.slice(); qsrc=src; ls.set('eqp-queue',null); loadTrack(id,{play:true});
+  const at=performance.now(); ensureUnlocked(); queue=ids.slice(); qsrc=src; ls.set('eqp-queue',null); loadTrack(id,{play:true,at:at});
 }
 listEl.addEventListener('click',e=>{
   const g=e.target.closest('.grp');
@@ -1784,6 +1784,7 @@ function ensureUnlocked(){
   volNode.gain.value=0;
   const done=()=>{
     if(audio.src===startSrc){
+      if(!audio.paused) internalPauses++;   // the pause event for this stop arrives later; it is not the user's
       audio.pause();
       if(tmp){ audio.removeAttribute('src'); audio.load(); } else { try{audio.currentTime=pos;}catch(e){} }
     }
@@ -1855,8 +1856,11 @@ function renderNow(t){
   if(typeof syncFav==='function') syncFav();
   if(typeof qRender==='function') qRender();
 }
+let pauseAt=0;                      // time of the last ⏸ tap: a play request made before it must not start playback
 async function loadTrack(id,opts){
   opts=opts||{}; const t=byId(id); if(!t) return;
+  const askedAt=opts.at||performance.now();
+  if(opts.play&&pauseAt<=askedAt) wantPlay=true;
   if(isStreamTrack(t)) return loadStreamTrack(t,opts);
   document.body.classList.remove('stream-dsp');
   if(SX.active()) SX.stop();
@@ -1874,7 +1878,8 @@ async function loadTrack(id,opts){
   audio.src=url; srcId=id; lyrRequest(t,buf);
   if(old) URL.revokeObjectURL(old);
   setSeek(0); $('#cur').textContent=fmtTime(pendingPos); $('#dur').textContent='0:00';
-  if(opts.play){
+  if(opts.play&&pauseAt>askedAt){ wantPlay=false; }
+  else if(opts.play){
     try{ac.resume();}catch(e){}
     const p=audio.play();
     if(p&&p.catch) p.catch(()=>toast('Tap ▶ to start playback'));
@@ -2009,21 +2014,24 @@ let lastSave=0;
 const kick=()=>{ try{ const p=ac.resume(); if(p&&p.catch) p.catch(()=>{}); }catch(e){} };
 const elBroken=()=>!audio.getAttribute('src')||!!audio.error;
 function lastPos(){ const l=ls.get('eqp-last',null); return audio.currentTime>0?audio.currentTime:(l&&l.id===curId?(l.pos||0):0); }
+let wantPlay=false;                 // what the user asked for: true after ▶, false after ⏸
 function reloadCurrent(play,why){
   if(curId==null) return;
   if(why) toast(why,2200);
-  loadTrack(curId,{play:play,pos:lastPos()});
+  loadTrack(curId,{play:play&&wantPlay,pos:lastPos()});
 }
 let wd=null;
 function startPlayback(){
   kick();
+  wantPlay=true;
   if(elBroken()){ reloadCurrent(true,'Reconnecting the song…'); return; }
   const t0=audio.currentTime;
   const p=audio.play();
-  if(p&&p.catch) p.catch(()=>reloadCurrent(true,'Reconnecting the song…'));
+  // Tapping ⏸ while play() is pending rejects it with AbortError; that must not restart playback.
+  if(p&&p.catch) p.catch(e=>{ if(!wantPlay||(e&&e.name==='AbortError')) return; reloadCurrent(true,'Reconnecting the song…'); });
   clearTimeout(wd);
   wd=setTimeout(()=>{            // watchdog: playing but silent or stuck?
-    if(audio.paused) return;
+    if(audio.paused||!wantPlay) return;
     if(ac.state!=='running'){ kick(); toast('Audio engine was asleep. Tap ▶ again if it is silent.',3200); }
     else if(audio.currentTime===t0&&audio.readyState<3) reloadCurrent(true,'Reconnecting the song…');
   },1600);
@@ -2033,15 +2041,15 @@ function wakeUp(){
   if(curId!=null&&!curIsStream()&&audio.paused&&elBroken()) reloadCurrent(false);
 }
 ac.onstatechange=()=>{            // engine interrupted while "playing": show the real state so one tap on ▶ revives it
-  if(ac.state!=='running'&&!audio.paused&&!unlocking){ audio.pause(); toast('Audio was interrupted. Tap ▶ to continue.',3000); }
+  if(ac.state!=='running'&&!audio.paused&&!unlocking){ wantPlay=false; audio.pause(); toast('Audio was interrupted. Tap ▶ to continue.',3000); }
 };
 window.addEventListener('pageshow',wakeUp); window.addEventListener('focus',wakeUp);
 playBtn.onclick=()=>{
   kick();
   if(curIsStream()){ if(SX.active()) SX.toggle(); else SX.play(byId(curId),SX.position()); return; }
   if(curId==null){ if(lib.length){ ensureUnlocked(); queue=viewList().map(t=>t.id); loadTrack(queue[0],{play:true}); } return; }
-  if(audio.paused){ unlocked=true; startPlayback(); }
-  else audio.pause();
+  if(wantPlay){ wantPlay=false; pauseAt=performance.now(); audio.pause(); }
+  else { unlocked=true; startPlayback(); }
 };
 $('#next').onclick=()=>{ ensureUnlocked(); const n=nextId(1); if(n!=null) loadTrack(n,{play:true}); };
 $('#prev').onclick=()=>{
@@ -2054,10 +2062,12 @@ function syncModes(){ shufBtn.classList.toggle('on',prefs.shuffle); repBtn.class
 shufBtn.onclick=()=>{prefs.shuffle=!prefs.shuffle;savePrefs();syncModes();};
 repBtn.onclick=()=>{prefs.repeat=(prefs.repeat+1)%3;savePrefs();syncModes();};
 audio.addEventListener('play',()=>{cancelSleepFade();playBtn.innerHTML=ICON.pause;markCurrent();liveUntil=0;vizDirty=true;});
-audio.addEventListener('pause',()=>{playBtn.innerHTML=ICON.play;markCurrent();savePos();liveUntil=performance.now()+4200;});
+let internalPauses=0;
+audio.addEventListener('pause',()=>{ if(internalPauses>0) internalPauses--; else wantPlay=false; playBtn.innerHTML=ICON.play;markCurrent();savePos();liveUntil=performance.now()+4200;});
 audio.addEventListener('ended',()=>{
   if(unlocking) return;
   if(repeatOne()) return;
+  wantPlay=false;
   const n=nextId(1);
   if(n!=null) loadTrack(n,{play:true});
   else { playBtn.innerHTML=ICON.play; try{audio.currentTime=0;}catch(e){} savePos(); }
@@ -2082,7 +2092,7 @@ document.addEventListener('visibilitychange',()=>{ if(document.hidden) savePos(t
 try{
   if('mediaSession' in navigator){
     navigator.mediaSession.setActionHandler('play',()=>{audio.play().catch(()=>{});});
-    navigator.mediaSession.setActionHandler('pause',()=>audio.pause());
+    navigator.mediaSession.setActionHandler('pause',()=>{ wantPlay=false; audio.pause(); });
     navigator.mediaSession.setActionHandler('previoustrack',()=>$('#prev').click());
     navigator.mediaSession.setActionHandler('nexttrack',()=>$('#next').click());
   }
