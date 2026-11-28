@@ -1000,6 +1000,10 @@ function buildSliders(){
 
 /* ---------- preamp pill slider ---------- */
 const PMIN=-24, PMAX=6, PW=26;
+// The slider shows the level the output actually gets. With Headroom on, that is the base preamp minus the
+// automatic trim, so it moves when the EQ, bass or treble change. Dragging sets the base to keep the shown value.
+const preShown=()=>{ const v=(state.auto&&!state.bypass)?state.pre-grDb:state.pre; return Math.round(clamp(v,PMIN,PMAX)*10)/10; };
+const preSet=v=>{ const base=(state.auto&&!state.bypass)?v+grDb:v; state.pre=Math.round(clamp(base,-24,6)*10)/10; };
 const pill=$('#pre'), pFill=pill.querySelector('.pfill'), pThumb=pill.querySelector('.pthumb'), pZero=pill.querySelector('.pzero');
 (function(){
   let last=0, drag=false;
@@ -1011,17 +1015,17 @@ const pill=$('#pre'), pFill=pill.querySelector('.pfill'), pThumb=pill.querySelec
   pill.addEventListener('pointerdown',e=>{
     e.preventDefault();
     const now=performance.now();
-    if(now-last<320){ last=0; state.pre=0; update(); return; } // double-tap = reset preamp
+    if(now-last<320){ last=0; preSet(0); update(); return; } // double-tap = reset preamp
     last=now; drag=true; pill.classList.add('drag'); try{pill.setPointerCapture(e.pointerId);}catch(_){}
-    state.pre=val(e); update();
+    preSet(val(e)); update();
   });
-  pill.addEventListener('pointermove',e=>{ if(drag){ state.pre=val(e); update(); } });
+  pill.addEventListener('pointermove',e=>{ if(drag){ preSet(val(e)); update(); } });
   const end=()=>{ drag=false; pill.classList.remove('drag'); };
   pill.addEventListener('pointerup',end); pill.addEventListener('pointercancel',end); pill.addEventListener('lostpointercapture',end);
   pill.addEventListener('keydown',e=>{
     const d=e.key==='ArrowUp'||e.key==='ArrowRight'?0.5:e.key==='ArrowDown'||e.key==='ArrowLeft'?-0.5:0;
-    if(e.key==='Home'||e.key==='0'){ state.pre=0; update(); e.preventDefault(); }
-    else if(d){ state.pre=clamp(Math.round((state.pre+d)*10)/10,PMIN,PMAX); update(); e.preventDefault(); }
+    if(e.key==='Home'||e.key==='0'){ preSet(0); update(); e.preventDefault(); }
+    else if(d){ preSet(clamp(Math.round((preShown()+d)*10)/10,PMIN,PMAX)); update(); e.preventDefault(); }
   });
 })();
 
@@ -1086,13 +1090,14 @@ function syncUI(){
     c.bt.setAttribute('aria-valuenow',g);
     c.bt.classList.toggle('byp',state.bypass);
   });
-  const f=(state.pre-PMIN)/(PMAX-PMIN), z=-PMIN/(PMAX-PMIN), lo=Math.min(f,z), hi=Math.max(f,z);
+  const shown=preShown();
+  const f=(shown-PMIN)/(PMAX-PMIN), z=-PMIN/(PMAX-PMIN), lo=Math.min(f,z), hi=Math.max(f,z);
   pThumb.style.left='calc((100% - '+PW+'px) * '+f.toFixed(4)+')';
   pFill.style.left='calc('+(PW/2)+'px + (100% - '+PW+'px) * '+lo.toFixed(4)+')';
   pFill.style.width='calc((100% - '+PW+'px) * '+(hi-lo).toFixed(4)+')';
   pZero.style.left='calc('+(PW/2)+'px + (100% - '+PW+'px) * '+z.toFixed(4)+')';
-  pill.setAttribute('aria-valuenow',state.pre); pill.setAttribute('aria-valuetext',state.pre.toFixed(1)+' dB');
-  $('#preO').textContent=(state.pre>0?'+':'')+state.pre.toFixed(1)+' dB';
+  pill.setAttribute('aria-valuenow',shown); pill.setAttribute('aria-valuetext',shown.toFixed(1)+' dB');
+  $('#preO').textContent=(shown>0?'+':'')+shown.toFixed(1)+' dB';
   $('#grRead').textContent=state.auto?(grDb>0?'−'+grDb.toFixed(1):'0.0')+' dB':'off';
   $('#tone').classList.toggle('byp',state.bypass);
   syncBass(); syncTreble();

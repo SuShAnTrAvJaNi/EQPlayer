@@ -1,4 +1,4 @@
-const C='eqp-v13';
+const C='eqp-v14';
 const FILES=['./','./index.html','./config.js','./manifest.json','./icon-180.png','./icon-192.png','./icon-512.png','./lyrics/engine.js','./lyrics/worker.js','./streaming/providers.js'];
 // No skipWaiting on install: a new version waits until the page asks for it (the "Update available" button).
 self.addEventListener('install',e=>{e.waitUntil(caches.open(C).then(c=>c.addAll(FILES)));});
