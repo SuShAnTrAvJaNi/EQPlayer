@@ -215,6 +215,18 @@ st.setProperty('--acc',c);st.setProperty('--acc2','hsl('+(h-4)+' '+s+'% 48%)');}
   </div>
   <div class="msec"><span class="lab">Audio Engine</span>
     <button class="mrow tog" id="autoM"><span>Headroom</span><small>auto preamp</small></button>
+    <div class="mrow"><span>Playback speed<small>0.5× to 2.0× for local tracks</small></span>
+      <select id="spdSel" aria-label="Playback speed">
+        <option value="0.5">0.5×</option>
+        <option value="0.75">0.75×</option>
+        <option value="0.9">0.9×</option>
+        <option value="1">1.0× (Normal)</option>
+        <option value="1.1">1.1×</option>
+        <option value="1.25">1.25×</option>
+        <option value="1.5">1.5×</option>
+        <option value="2">2.0×</option>
+      </select>
+    </div>
     <div class="mrow"><span>Loudness (ReplayGain)<small>normalize track volume</small></span>
       <select id="rgMode" aria-label="Loudness normalization">
         <option value="off">Off</option>

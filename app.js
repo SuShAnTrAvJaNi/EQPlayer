@@ -362,6 +362,7 @@ function syncParamBar(){
   const ep=window._eqParam; if(!ep) return;
   const i=ep.sel, fq=state.freqs[i]||BANDS[i], q=state.qs[i]||BQ, tp=state.types[i]||'peaking';
   $('#paramBar').hidden=!ep.open;
+  $('#sEq').classList.toggle('param-open',ep.open);
   $('#paramTog').classList.toggle('on',ep.open);
   cols.forEach((c,idx)=>c.col.classList.toggle('sel',ep.open&&idx===i));
   $('#pBandLbl').textContent='Band '+(i+1)+' ('+ep.fLabel(fq)+' Hz)';
@@ -376,6 +377,7 @@ function openParamBar(open){
   const ep=window._eqParam; if(!ep) return;
   ep.open=open!==undefined?!!open:!ep.open;
   syncParamBar();
+  vizDirty=true; setTimeout(sizeViz,30);
 }
 $('#paramTog').onclick=()=>openParamBar();
 $('#pClose').onclick=()=>openParamBar(false);
@@ -574,13 +576,18 @@ function fit(){
   const vw=de.clientWidth||window.innerWidth, vh=de.clientHeight||window.innerHeight;
   if(vw<200||vh<200) return;
   const cl=stage.classList, portrait=vh>=vw, phone=Math.min(vw,vh)<600;
+  const wide=!portrait&&vw>=900&&vh>=520;
   cl.toggle('portrait',portrait); cl.toggle('landscape',!portrait);
   cl.toggle('phone',phone); cl.toggle('tablet',!phone);
-  cl.toggle('short',vh<700); cl.toggle('tiny',vw<340); cl.toggle('squat',vh<340);
-  // landscape tablets and desktops get the two-column layout: Now Playing on the left, the current tab on the right
-  cl.toggle('wide',!portrait&&vw>=900);
+  cl.toggle('short',vh<700); cl.toggle('tiny',vw<340); cl.toggle('squat',vh<440);
+  // landscape tablets and desktops with enough vertical height get the two-column split layout
+  cl.toggle('wide',wide);
+  if(wide&&cl.contains('eq-sheet')){ closeEqSheet(true); setTab('eq'); }
+  if(wide&&cl.contains('np-open')){ closeNP(); }
+  if(typeof npEl!=='undefined'&&npEl) npEl.setAttribute('aria-hidden',(wide||cl.contains('np-open'))?'false':'true');
   ['library','eq','search'].forEach(x=>cl.toggle('r-'+x,curTab===x));
   sizeViz();
+  if(typeof drawWave==='function') drawWave();
 }
 let fitTimer=null;
 function safeFit(){ if(typing()) return; clearTimeout(fitTimer); fitTimer=setTimeout(fit,120); }
@@ -1476,8 +1483,7 @@ async function loadTrack(id,opts){
   $('#tBadge').textContent=t.fmt||'';
   const url=srcData.file?URL.createObjectURL(srcData.file):URL.createObjectURL(new Blob([buf],{type:t.mime||'audio/mpeg'}));
   const old=curUrl; curUrl=url; pendingPos=opts.pos||0;
-  audio.playbackRate=prefs.speed;
-  audio.src=url; srcId=id; lyrRequest(t,buf);
+  audio.src=url; srcId=id; syncDeckSpeed(audio); lyrRequest(t,buf);
   if(old) URL.revokeObjectURL(old);
   setSeek(0); $('#cur').textContent=fmtTime(pendingPos); $('#dur').textContent='0:00';
   recompute(); syncUI();
@@ -1485,6 +1491,7 @@ async function loadTrack(id,opts){
   if(opts.play&&pauseAt>askedAt){ wantPlay=false; }
   else if(opts.play){
     try{ac.resume();}catch(e){}
+    syncDeckSpeed(audio);
     const p=audio.play();
     if(p&&p.catch) p.catch(()=>toast('Tap ▶ to start playback'));
   }
@@ -1504,8 +1511,7 @@ async function startCrossfade(nextTrackId,fadeSec){
   if(!buf&&srcData.file){ try{ buf=await srcData.file.arrayBuffer(); }catch(e){} }
   const url=srcData.file?URL.createObjectURL(srcData.file):URL.createObjectURL(new Blob([buf],{type:t.mime||'audio/mpeg'}));
   const oldUrl=curUrl; curUrl=url;
-  inEl.playbackRate=prefs.speed;
-  inEl.src=url;
+  inEl.src=url; syncDeckSpeed(inEl);
   try{
     const now=ac.currentTime, dur=Math.max(0.4,fadeSec);
     deckGains[outIdx].gain.cancelScheduledValues(now);
@@ -1514,7 +1520,9 @@ async function startCrossfade(nextTrackId,fadeSec){
     deckGains[inIdx].gain.cancelScheduledValues(now);
     deckGains[inIdx].gain.setValueAtTime(0,now);
     deckGains[inIdx].gain.linearRampToValueAtTime(1,now+dur);
+    syncDeckSpeed(inEl);
     await inEl.play();
+    syncDeckSpeed(inEl);
     activeDeck=inIdx; audio=inEl;
     curId=nextTrackId; srcId=nextTrackId; curSlot=null; pendingPos=0;
     if(!t.fmt&&buf) t.fmt=audioFmt(buf,t.name);
@@ -1776,6 +1784,7 @@ function startPlayback(){
   if(curId!=null&&srcId!==curId&&!curIsStream()){ loadTrack(curId,{play:true,pos:pendingPos}); return; }
   if(elBroken()){ reloadCurrent(true,'Reconnecting the song…'); return; }
   const t0=audio.currentTime;
+  syncDeckSpeed(audio);
   const p=audio.play();
   // Tapping ⏸ while play() is pending rejects it with AbortError; that must not restart playback.
   if(p&&p.catch) p.catch(e=>{ if(!wantPlay||(e&&e.name==='AbortError')) return; reloadCurrent(true,'Reconnecting the song…'); });
@@ -1813,7 +1822,7 @@ shufBtn.onclick=()=>{prefs.shuffle=!prefs.shuffle;savePrefs();syncModes();};
 repBtn.onclick=()=>{prefs.repeat=(prefs.repeat+1)%3;savePrefs();syncModes();};
 let internalPauses=0;
 decks.forEach(el=>{
-  el.addEventListener('play',()=>{ if(el!==audio) return; cancelSleepFade();playBtn.innerHTML=ICON.pause;markCurrent();liveUntil=0;vizDirty=true; });
+  el.addEventListener('play',()=>{ if(el!==audio) return; syncDeckSpeed(el); cancelSleepFade();playBtn.innerHTML=ICON.pause;markCurrent();liveUntil=0;vizDirty=true; });
   el.addEventListener('pause',()=>{ if(el!==audio) return; if(internalPauses>0) internalPauses--; else wantPlay=false; playBtn.innerHTML=ICON.play;markCurrent();savePos();liveUntil=performance.now()+4200; });
   el.addEventListener('ended',()=>{
     if(el!==audio||unlocking) return;
@@ -1825,6 +1834,7 @@ decks.forEach(el=>{
   });
   el.addEventListener('loadedmetadata',()=>{
     if(el!==audio) return;
+    syncDeckSpeed(el);
     drawWave(); lyrTryStart();
     if(pendingPos>0&&isFinite(audio.duration)){ try{audio.currentTime=Math.min(pendingPos,Math.max(0,audio.duration-1));}catch(e){} }
     if(isFinite(audio.duration)) pendingPos=0;
@@ -1834,15 +1844,16 @@ decks.forEach(el=>{
     msPos();
     if(!seeking){ $('#cur').textContent=fmtTime(audio.currentTime); if(audio.duration) setSeek(Math.round(audio.currentTime/audio.duration*1000)); }
     if(typeof checkAbLoop==='function') checkAbLoop();
-    if(prefs.xfade>0&&!xfading&&wantPlay&&!curIsStream()&&prefs.repeat!==2&&!abLoop.active&&isFinite(audio.duration)&&audio.duration>prefs.xfade+2){
-      const rem=audio.duration-audio.currentTime;
-      if(rem>0.2&&rem<=prefs.xfade){ const nid=nextId(1); if(nid!=null&&!isStreamTrack(byId(nid))) startCrossfade(nid,rem); }
+    const rate=prefs.speed||1;
+    if(prefs.xfade>0&&!xfading&&wantPlay&&!curIsStream()&&prefs.repeat!==2&&!abLoop.active&&isFinite(audio.duration)&&audio.duration>(prefs.xfade*rate)+2){
+      const wallRem=(audio.duration-audio.currentTime)/rate;
+      if(wallRem>0.2&&wallRem<=prefs.xfade){ const nid=nextId(1); if(nid!=null&&!isStreamTrack(byId(nid))) startCrossfade(nid,wallRem); }
     }
     const now=Date.now(); if(now-lastSave>1500){ lastSave=now; savePos(); }
   });
   el.addEventListener('error',()=>{ if(el===audio&&curId!=null&&audio.getAttribute('src')) toast('This file could not be played'); });
 });
-function repeatOne(){ if(prefs.repeat===2){audio.currentTime=0;audio.play().catch(()=>{});return true;} return false; }
+function repeatOne(){ if(prefs.repeat===2){audio.currentTime=0;syncDeckSpeed(audio);audio.play().catch(()=>{});return true;} return false; }
 vol.value=prefs.vol; fillR(vol);
 vol.oninput=()=>{ prefs.vol=+vol.value; if(prefs.muted){ prefs.muted=false; syncMute(); } fillR(vol); savePrefs(); if(SX.active()) SX.setVolume(prefs.vol); volNode.gain.setTargetAtTime(userGain(),ac.currentTime,0.02); };
 $('#search').addEventListener('input',e=>{ filter=e.target.value; renderSearch(); });
@@ -2274,20 +2285,33 @@ function openAddToPlaylist(trackIds){
   });
 }
 
+function syncDeckSpeed(el){
+  const r=prefs.speed||1;
+  try{
+    el.defaultPlaybackRate=r;
+    el.playbackRate=r;
+    if('preservesPitch' in el) el.preservesPitch=true;
+    else if('webkitPreservesPitch' in el) el.webkitPreservesPitch=true;
+    else if('mozPreservesPitch' in el) el.mozPreservesPitch=true;
+  }catch(e){}
+}
 function applySpeed(s){
   prefs.speed=clamp(+s||1,0.5,2); savePrefs();
-  decks.forEach(d=>{ d.playbackRate=prefs.speed; });
+  decks.forEach(syncDeckSpeed);
   const lbl=(Number.isInteger(prefs.speed)?prefs.speed.toFixed(1):String(prefs.speed))+'×';
   $('#spdBtn').textContent=lbl; $('#spdBtn').classList.toggle('on',prefs.speed!==1);
   $('#spdMenuLbl').textContent=lbl;
+  const sel=$('#spdSel'); if(sel) sel.value=String(prefs.speed);
   msPos();
+  if(curId!=null&&curIsStream()&&prefs.speed!==1) toast('Playback speed applies to local tracks only',2800);
 }
 function openSpeedPicker(){
   const opts=[0.5,0.75,0.9,1,1.1,1.25,1.5,2];
-  openPickModal('Playback speed',opts.map(v=>({val:v,label:(Number.isInteger(v)?v.toFixed(1):v)+'×'+(v===1?' (Normal)':''),on:prefs.speed===v})),it=>applySpeed(it.val));
+  openPickModal('Playback speed',opts.map(v=>({val:v,label:(Number.isInteger(v)?v.toFixed(1):v)+'×'+(v===1?' (Normal)':''),on:Math.abs(prefs.speed-v)<0.01})),it=>applySpeed(it.val));
 }
 $('#spdBtn').onclick=openSpeedPicker;
 $('#spdMenuBtn').onclick=openSpeedPicker;
+if($('#spdSel')) $('#spdSel').onchange=e=>applySpeed(e.target.value);
 
 function syncAbUI(){
   const show=abLoop.open||abLoop.a!=null;
@@ -2367,6 +2391,7 @@ $('#rmCur').onclick=()=>{ if(curId!=null) askRemove(curId); };
 let eqSheetT=0;
 let eqFromNP=false;
 function openEqSheet(){
+  if(stage.classList.contains('wide')){ setTab('eq'); return; }
   clearTimeout(eqSheetT);
   eqFromNP=stage.classList.contains('np-open');
   stage.classList.add('eq-sheet'); vizDirty=true;
@@ -2612,11 +2637,45 @@ function initGlue(){
 /* ---------- start-up ---------- */
 async function init(){
   try{ if(navigator.storage&&navigator.storage.persist) navigator.storage.persist(); }catch(e){}
-  try{ if('serviceWorker' in navigator && /^https?:/.test(location.protocol)) navigator.serviceWorker.register('sw.js').catch(()=>{}).then(reg=>{ if(!reg) return;
-    const offer=w=>{ const b=$('#updBar'); b.hidden=false; b.onclick=()=>{ b.disabled=true; b.textContent='Updating...'; navigator.serviceWorker.addEventListener('controllerchange',()=>location.reload(),{once:true}); w.postMessage('skip'); }; };
-    if(reg.waiting&&navigator.serviceWorker.controller) offer(reg.waiting);
-    reg.addEventListener('updatefound',()=>{ const w=reg.installing; if(w) w.addEventListener('statechange',()=>{ if(w.state==='installed'&&navigator.serviceWorker.controller) offer(w); }); });
-  }); }catch(e){}
+  try{
+    if('serviceWorker' in navigator && /^https?:/.test(location.protocol)){
+      const hadCtrl=!!navigator.serviceWorker.controller;
+      let swReloading=false, pendingAutoUpd=false, lastUpdChk=Date.now();
+      const applyAutoUpd=()=>{
+        if(swReloading) return;
+        swReloading=true;
+        try{ flushSaves(); }catch(e){}
+        location.reload();
+      };
+      const scheduleAutoUpd=()=>{
+        if(!hadCtrl||swReloading) return;
+        if(isPausedNow()||curId==null){ applyAutoUpd(); return; }
+        pendingAutoUpd=true;
+        const b=$('#updBar'); b.hidden=false; b.textContent='Update ready · applies on pause (tap to reload)';
+        b.onclick=()=>{ b.disabled=true; b.textContent='Updating…'; applyAutoUpd(); };
+      };
+      navigator.serviceWorker.addEventListener('controllerchange',scheduleAutoUpd);
+      decks.forEach(d=>{
+        d.addEventListener('pause',()=>{ if(pendingAutoUpd&&!wantPlay) applyAutoUpd(); });
+        d.addEventListener('ended',()=>{ if(pendingAutoUpd&&!wantPlay) applyAutoUpd(); });
+      });
+      navigator.serviceWorker.register('sw.js',{updateViaCache:'none'}).catch(()=>{}).then(reg=>{
+        if(!reg) return;
+        reg.update().catch(()=>{});
+        if(reg.waiting&&navigator.serviceWorker.controller) reg.waiting.postMessage('skip');
+        reg.addEventListener('updatefound',()=>{
+          const w=reg.installing;
+          if(w) w.addEventListener('statechange',()=>{
+            if(w.state==='installed'&&navigator.serviceWorker.controller) w.postMessage('skip');
+          });
+        });
+        document.addEventListener('visibilitychange',()=>{
+          if(!document.hidden&&Date.now()-lastUpdChk>30000){ lastUpdChk=Date.now(); reg.update().catch(()=>{}); }
+        });
+        setInterval(()=>reg.update().catch(()=>{}),3600000);
+      });
+    }
+  }catch(e){}
   $('#prev').innerHTML=ICON.prev; $('#next').innerHTML=ICON.next; $('#shuf').innerHTML=ICON.shuf; playBtn.innerHTML=ICON.play;
   fillR(seek);
   applyTheme(false); renderPresetSelect(''); buildSliders(); syncModes(); setBypassGains(true); update(); flushUpdate(); initUI(); fit(); applySink(); syncMute();
