@@ -6,9 +6,15 @@
         cfgSp.value = o.VITE_SPOTIFY_CLIENT_ID || '';
         cfgAm.value = o.VITE_APPLE_MUSIC_DEVELOPER_TOKEN || '';
         cfgSave.onclick = function () {
+          var sp = cfgSp.value.trim(), am = cfgAm.value.trim();
+          if (!sp && !am) {
+            cfgSave.textContent = 'Enter a key first';
+            setTimeout(function () { cfgSave.textContent = 'Save keys on this device'; }, 2000);
+            return;
+          }
           localStorage.setItem(KEY, JSON.stringify({
-            VITE_SPOTIFY_CLIENT_ID: cfgSp.value.trim(),
-            VITE_APPLE_MUSIC_DEVELOPER_TOKEN: cfgAm.value.trim()
+            VITE_SPOTIFY_CLIENT_ID: sp,
+            VITE_APPLE_MUSIC_DEVELOPER_TOKEN: am
           }));
           cfgSave.textContent = 'Saved. Reload the page.';
         };
@@ -135,7 +141,7 @@ limiterIn.connect(limiter); limiter.connect(master); master.connect(an); an.conn
 limiterIn.connect(mSplitIn); mSplitIn.connect(mSplit); mSplit.connect(mAn[0],0); mSplit.connect(mAn[1],1);
 mAn.forEach(a=>a.connect(meterMute)); meterMute.connect(ac.destination);
 
-const userGain=()=>prefs.vol*prefs.vol;
+const userGain=()=>prefs.muted?0:prefs.vol*prefs.vol;
 volNode.gain.value=userGain();
 let vizDirty=true;
 
@@ -376,9 +382,18 @@ function applyPreset(v){
   renderPresetSelect(v);
 }
 presetSel.onchange=()=>applyPreset(presetSel.value);
+/* ---------- mute: the speaker icon at the low end of the volume row ---------- */
+function syncMute(){
+  const b=$('#muteBtn'); if(!b) return;
+  b.setAttribute('aria-pressed',prefs.muted?'true':'false'); b.classList.toggle('on',!!prefs.muted); b.setAttribute('aria-label',prefs.muted?'Unmute':'Mute');
+  volNode.gain.setTargetAtTime(userGain(),ac.currentTime,0.02);
+  if(SX.active()) SX.setVolume(prefs.muted?0:prefs.vol);
+}
+$('#muteBtn').onclick=()=>{ prefs.muted=!prefs.muted; savePrefs(); syncMute(); };
 $('#savePreset').onclick=()=>{
   showModal({title:'Save preset',text:'Name this EQ setting (e.g. Headphones).',input:true,value:'',ok:'Save',onOk:name=>{
-    name=name.slice(0,30);
+    name=name.replace(/[\u0000-\u001f\u007f]/g,'').trim().slice(0,30);
+    if(!name) return toast('Give the preset a name');
     customPresets[name]={gains:state.gains.slice(),pre:state.pre,auto:state.auto,bass:state.bass,treble:state.treble};
     ls.set('eqp-presets10',customPresets);
     renderPresetSelect('u:'+name);
@@ -411,6 +426,8 @@ function submitModal(){
 }
 mOk.onclick=submitModal;
 $('#mCancel').onclick=hideModal;
+modal.addEventListener('click',e=>{ if(e.target===modal) hideModal(); });   // tap the dimmed backdrop to dismiss
+document.addEventListener('keydown',e=>{ if(e.key==='Escape'&&modal.classList.contains('show')) hideModal(); });
 mInput.addEventListener('keydown',e=>{if(e.key==='Enter')submitModal();});
 let toastTimer=null;
 function toast(msg,ms){
@@ -1322,7 +1339,7 @@ audio.addEventListener('timeupdate',()=>{
 });
 audio.addEventListener('error',()=>{ if(curId!=null&&audio.getAttribute('src')) toast('This file could not be played'); });
 vol.value=prefs.vol; fillR(vol);
-vol.oninput=()=>{ prefs.vol=+vol.value; fillR(vol); savePrefs(); if(SX.active()) SX.setVolume(prefs.vol); volNode.gain.setTargetAtTime(userGain(),ac.currentTime,0.02); };
+vol.oninput=()=>{ prefs.vol=+vol.value; if(prefs.muted){ prefs.muted=false; syncMute(); } fillR(vol); savePrefs(); if(SX.active()) SX.setVolume(prefs.vol); volNode.gain.setTargetAtTime(userGain(),ac.currentTime,0.02); };
 $('#search').addEventListener('input',e=>{ filter=e.target.value; renderSearch(); });
 $('#search').addEventListener('keydown',e=>{ if(e.key==='Enter') e.target.blur(); });
 window.addEventListener('pagehide',()=>savePos(true));
@@ -1459,7 +1476,8 @@ function lyrTick(force){
 }
 function lyrRequest(t,buf){
   lyrCancel(); lyrSetLines([],false); lyr.cur=t;
-  if(!t||!lyrCfg.on){ lyrShow(''); return; }
+  if(!lyrCfg.on){ lyrShow(''); return; }
+  if(!t){ lyrSetLines([],false); lyrShow('No track loaded'); return; }
   lyr.req={t,buf,id:lyr.id};
   lyrShow('Looking for lyrics…');
   lyrTryStart();
@@ -1531,8 +1549,10 @@ function syncStreamUI(){
   const s=SP_.status();
   $('#spS').textContent=!s.spotify.configured?'Enter the client ID below':s.spotify.connected?'Connected · tap to sign out':'Not connected';
   $('#amS').textContent=!s.apple.configured?'Enter the token below':s.apple.connected?'Connected · tap to sign out':'Not connected';
-  $('#spImp').disabled=!s.spotify.connected;
-  $('#amImp').disabled=!s.apple.connected;
+  // aria-disabled instead of disabled, so a tap still gives feedback
+  [['#spImp',s.spotify.connected,'Connect Spotify first'],['#amImp',s.apple.connected,'Connect Apple Music first']].forEach(([sel,ok,msg])=>{
+    const b=$(sel); b.classList.toggle('off',!ok); b.setAttribute('aria-disabled',ok?'false':'true'); b.dataset.hint=msg;
+  });
 }
 function askDisconnect(p){
   const name=p==='spotify'?'Spotify':'Apple Music';
@@ -1565,8 +1585,8 @@ async function streamImport(p){
   }catch(e){ toast(e.message||'Import failed',4200); }
   finally{ syncStreamUI(); }
 }
-$('#spImp').onclick=()=>streamImport('spotify');
-$('#amImp').onclick=()=>streamImport('apple');
+$('#spImp').onclick=()=>{ if($('#spImp').classList.contains('off')) return toast($('#spImp').dataset.hint||'Connect first',2400); streamImport('spotify'); };
+$('#amImp').onclick=()=>{ if($('#amImp').classList.contains('off')) return toast($('#amImp').dataset.hint||'Connect first',2400); streamImport('apple'); };
 function handleStreamRedirect(){
   SP_.handleRedirect()
     .then(r=>{ if(r) toast(r.msg,3200); syncStreamUI(); })
@@ -1852,8 +1872,9 @@ function initShell(){
 const outDev=$('#outDev'), outNote=$('#outNote');
 const canSink=typeof AudioContext!=='undefined'&&'setSinkId' in AudioContext.prototype;
 async function applySink(){
-  if(!canSink) return;
-  try{ await ac.setSinkId(ls.get('eqp-sink','')||''); }
+  const id=ls.get('eqp-sink','')||'';
+  if(!canSink||!id) return;          // nothing chosen: keep the browser's default device
+  try{ await ac.setSinkId(id); }
   catch(e){ toast('Could not switch to that output',3000); ls.set('eqp-sink',''); }
 }
 async function fillOutputs(){
@@ -1898,7 +1919,7 @@ async function init(){
   }); }catch(e){}
   $('#prev').innerHTML=ICON.prev; $('#next').innerHTML=ICON.next; $('#shuf').innerHTML=ICON.shuf; playBtn.innerHTML=ICON.play;
   fillR(seek);
-  applyTheme(false); renderPresetSelect(''); buildSliders(); syncModes(); setBypassGains(true); update(); flushUpdate(); initUI(); fit(); applySink();
+  applyTheme(false); renderPresetSelect(''); buildSliders(); syncModes(); setBypassGains(true); update(); flushUpdate(); initUI(); fit(); applySink(); syncMute();
   requestAnimationFrame(frame);
   await store.init();
   try{ lib=await store.all(); }catch(e){ lib=[]; }

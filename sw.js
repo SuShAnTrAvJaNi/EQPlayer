@@ -1,4 +1,4 @@
-const C='eqp-v15';
+const C='eqp-v17';
 const X='eqp-ext-v1';   // third-party libraries (Whisper runtime, WASM): cache-first, kept across app versions
 const FILES=['./','./index.html','./styles.css','./app.js','./config.js','./manifest.json','./icon-180.png','./icon-192.png','./icon-512.png','./lyrics/engine.js','./lyrics/worker.js','./streaming/providers.js'];
 // No skipWaiting on install: a new version waits until the page asks for it (the "Update available" button).

@@ -213,7 +213,9 @@
 
   async function lookupLrclib(meta, sig) {
     // "Song - 2012 Remaster" and "Song (Live)" are usually listed under the plain title
-    const clean = String(meta.title || '').replace(/\s+[-–]\s+.*\b(remaster(ed)?|live|mono|stereo|version)\b.*$/i, '').replace(/\s*\((remaster(ed)?|live)[^)]*\)\s*$/i, '').trim();
+    // downloader tags such as "Song - Spotimate.app" or "Song [example.com]" are not part of the title
+    const untagged = String(meta.title || '').replace(/\s*[-–|]\s*[^-–|]*\b[a-z0-9-]+\.(app|com|net|org|io|to|fm|me|xyz)\b[^-–|]*$/i, '').replace(/\s*\[[^\]]*\.(app|com|net|org|io|to|fm|me|xyz)\]\s*$/i, '');
+    const clean = untagged.replace(/\s+[-–]\s+.*\b(remaster(ed)?|live|mono|stereo|version)\b.*$/i, '').replace(/\s*\((remaster(ed)?|live)[^)]*\)\s*$/i, '').trim();
     const base = { track_name: clean || meta.title, artist_name: meta.artist || '' };
     let rec = null;
     if (meta.album && meta.duration > 0 && meta.artist) {   // /get needs an artist; without one, go to /search

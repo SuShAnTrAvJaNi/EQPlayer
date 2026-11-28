@@ -13,6 +13,12 @@
 <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no, viewport-fit=cover">
 <title>EQ Player</title>
 <link rel="stylesheet" href="styles.css">
+<script>/* applies the saved accent before first paint, so the default red does not flash */
+(function(){try{var t=JSON.parse(localStorage.getItem('eqp-theme')||'null');if(!t||typeof t.h!=='number')return;
+var h=t.h,s=t.s,st=document.documentElement.style;
+var c='hsl('+h+' '+s+'% 50%)';if(h===353&&Math.round(s)===96)c='#FA243C';
+st.setProperty('--acc',c);st.setProperty('--acc2','hsl('+(h-4)+' '+s+'% 48%)');}catch(e){}})();
+</script>
 </head>
 <body>
 <div id="stage" class="t-library">
@@ -46,7 +52,7 @@
         <button id="next" aria-label="Next"></button>
       </div>
       <div class="rvol">
-        <svg class="s" viewBox="0 0 24 24" aria-hidden="true"><path d="M4 9.500v5h3.500l5 4v-13l-5 4z"/></svg>
+        <button id="muteBtn" class="mutebtn" aria-pressed="false" aria-label="Mute"><svg class="s" viewBox="0 0 24 24" aria-hidden="true"><path d="M4 9.500v5h3.500l5 4v-13l-5 4z"/></svg></button>
         <input type="range" id="vol" min="0" max="1" step="0.01" value="1" aria-label="Volume">
         <svg class="s" viewBox="0 0 24 24" aria-hidden="true"><path d="M4 9.500v5h3.500l5 4v-13l-5 4z"/><path d="M16 8.500a5 5 0 0 1 0 7M18.500 6a8.500 8.500 0 0 1 0 12"/></svg>
       </div>
@@ -169,7 +175,7 @@
   <div class="msec" id="outSec"><span class="lab">Audio Output</span>
     <div class="mrow" id="outRow"><span>Output device<small id="outNote">Where the sound plays</small></span><select id="outDev" aria-label="Output device"></select></div>
   </div>
-  <div class="msec"><span class="lab">Accent Color Theme</span>
+  <div class="msec"><span class="lab">Accent Colour Theme</span>
     <button class="mrow" id="themeBtn"><span>Colour theme</span><i class="swdot"></i></button>
   </div>
   <div class="msec"><span class="lab">Audio Engine</span>
@@ -189,7 +195,7 @@
       <input id="cfgAm" aria-label="Apple developer token" placeholder="Apple developer token" autocomplete="off" style="width:100%">
       <button id="cfgSave">Save keys on this device</button>
     </div>
-    <div class="row"><button id="spImp" disabled>Import Spotify</button><button id="amImp" disabled>Import Apple</button></div>
+    <div class="row"><button id="spImp" aria-disabled="true" class="off">Import Spotify</button><button id="amImp" aria-disabled="true" class="off">Import Apple</button></div>
     <div class="note2" id="stNote">Streamed tracks play through Spotify's or Apple's own player, so the EQ and reverb do not process them. Local MP3s go through the EQ. Playback needs Spotify Premium or an Apple Music subscription.</div>
   </div>
   <div class="msec"><span class="lab">Sleep Timer</span>
