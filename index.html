@@ -281,6 +281,8 @@ svg.s{fill:none;stroke:currentColor;stroke-width:2;stroke-linecap:round;stroke-l
 #menuBox{position:absolute;right:0;top:0;bottom:0;width:min(340px,90%);background:#171717;border-left:1px solid var(--line2);box-shadow:-12px 0 40px #000;padding:14px;display:flex;flex-direction:column;gap:14px;overflow:auto}
 #menuBox h2{margin:0;font-size:18px;display:flex;justify-content:space-between;align-items:center}
 .msec{display:flex;flex-direction:column;gap:6px}
+#outDev{max-width:56%;min-height:36px;color-scheme:dark;border-radius:10px;padding:0 8px}
+select{color-scheme:dark}
 .mrow{justify-content:space-between;min-height:48px;width:100%;text-align:left}
 .mrow small{color:var(--mut);font-weight:500;font-size:12px}
 .mrow.on small{color:inherit}
@@ -617,7 +619,9 @@ body.no-motion *,body.no-motion *::before,body.no-motion *::after{transition-dur
   <div class="row">
     <div class="pills" id="libTabs"><button data-lt="songs" class="on">All Songs</button><button data-lt="albums">Albums</button><button data-lt="artists">Artists</button></div>
     <label class="btn primary" for="files" id="addLbl">＋ Add MP3s</label>
+    <label class="btn" for="folderIn" id="addFolder">Folder</label>
     <input type="file" id="files" accept="audio/mpeg,audio/mp3,audio/*,.mp3,.lrc" multiple>
+    <input type="file" id="folderIn" webkitdirectory directory multiple>
   </div>
   <div class="row" id="libCrumb"><button id="libBack">‹ Back</button><span id="libTitle"></span></div>
   <div class="list" id="list"><div class="empty">Loading…</div></div>
@@ -716,6 +720,9 @@ body.no-motion *,body.no-motion *::before,body.no-motion *::after{transition-dur
   <h2>Settings <button id="menuDone" class="on" style="min-height:36px">Done</button></h2>
   <div class="msec"><span class="lab">Motion</span>
     <button class="mrow sw-row" id="motTog" role="switch" aria-checked="true"><span>Smooth transitions<small>animated screens, sheets and artwork</small></span><i class="switch"></i></button>
+  </div>
+  <div class="msec" id="outSec"><span class="lab">Audio Output</span>
+    <div class="mrow" id="outRow"><span>Output device<small id="outNote">Where the sound plays</small></span><select id="outDev" aria-label="Output device"></select></div>
   </div>
   <div class="msec"><span class="lab">Accent Color Theme</span>
     <button class="mrow" id="themeBtn"><span>Colour theme</span><i class="swdot"></i></button>
@@ -1234,7 +1241,7 @@ function setTab(t){
 navBtns.forEach(b=>b.onclick=()=>{ userNavigated=true; setTab(b.dataset.t); });
 const menuWrap=$('#menuWrap');
 function openMenu(){
-  markSettingsSeen();
+  markSettingsSeen(); fillOutputs();
   closeNP(); closeQueue(); closeEqSheet(true); closeMore();
   stage.classList.add('menu-open');
   menuWrap.classList.add('show');
@@ -1919,17 +1926,24 @@ function nextId(dir){
 }
 
 /* ---------- adding / removing songs ---------- */
-$('#files').addEventListener('click',()=>{ pickerStart(); ensureUnlocked(); });
-$('#files').addEventListener('cancel',pickerEnd);
-$('#files').onchange=async e=>{
-  pickerEnd();
-  const all=[...e.target.files];
-  const files=all.filter(isAudio);
-  const lrcMap=new Map(all.filter(f=>/\.lrc$/i.test(f.name)).map(f=>[stemOf(f.name),f]));
-  e.target.value='';
-  if(files.length) await addFiles(files,lrcMap);
-  else if(lrcMap.size) toast('Add the matching MP3 together with its .lrc file',3800);
-};
+// Files and folders share one handler. A folder pick returns every file below it (sub-folders included);
+// only audio is imported, and a .lrc is paired with its MP3 by name anywhere in the same pick.
+['files','folderIn'].forEach(id=>{
+  const inp=$('#'+id);
+  inp.addEventListener('click',()=>{ pickerStart(); ensureUnlocked(); });
+  inp.addEventListener('cancel',pickerEnd);
+  inp.onchange=async e=>{
+    pickerEnd();
+    const all=[...e.target.files];
+    const files=all.filter(isAudio);
+    const lrcMap=new Map(all.filter(f=>/\.lrc$/i.test(f.name)).map(f=>[stemOf(f.name),f]));
+    e.target.value='';
+    if(!all.length) return;
+    if(files.length) await addFiles(files,lrcMap);
+    else if(lrcMap.size) toast('Add the matching MP3 together with its .lrc file',3800);
+    else toast('No audio files found in that selection',3000);
+  };
+});
 async function addFiles(files,lrcMap){
   if(busyAdding){ toast('Still adding songs…'); return; }
   busyAdding=true;
@@ -2615,6 +2629,30 @@ function initShell(){
   syncPlayState(); syncFav(); drawWave();
 }
 
+/* ---------- output device (Chrome, Edge, Android; iPhone and iPad use AirPlay from Control Center) ---------- */
+const outDev=$('#outDev'), outNote=$('#outNote');
+const canSink=typeof AudioContext!=='undefined'&&'setSinkId' in AudioContext.prototype;
+async function applySink(){
+  if(!canSink) return;
+  try{ await ac.setSinkId(ls.get('eqp-sink','')||''); }
+  catch(e){ toast('Could not switch to that output',3000); ls.set('eqp-sink',''); }
+}
+async function fillOutputs(){
+  if(!canSink){
+    $('#outSec').hidden=false; outDev.hidden=true;
+    outNote.textContent='Use AirPlay in Control Center to pick the output on iPhone and iPad.';
+    return;
+  }
+  try{
+    const devs=(await navigator.mediaDevices.enumerateDevices()).filter(d=>d.kind==='audiooutput');
+    const cur=ls.get('eqp-sink','')||'';
+    outDev.innerHTML='<option value="">System default</option>'+devs.map((d,i)=>'<option value="'+d.deviceId+'">'+(d.label||'Output '+(i+1))+'</option>').join('');
+    outDev.value=devs.some(d=>d.deviceId===cur)?cur:'';
+    outNote.textContent='Where the sound plays';
+  }catch(e){ outNote.textContent='Outputs unavailable in this browser'; }
+}
+outDev.onchange=()=>{ ls.set('eqp-sink',outDev.value); applySink(); };
+if(navigator.mediaDevices&&navigator.mediaDevices.addEventListener) navigator.mediaDevices.addEventListener('devicechange',fillOutputs);
 const motTog=$('#motTog');
 function applyMotion(){
   const on=prefs.motion!==false;
@@ -2641,7 +2679,7 @@ async function init(){
   }); }catch(e){}
   $('#prev').innerHTML=ICON.prev; $('#next').innerHTML=ICON.next; $('#shuf').innerHTML=ICON.shuf; playBtn.innerHTML=ICON.play;
   fillR(seek);
-  applyTheme(false); renderPresetSelect(''); buildSliders(); syncModes(); setBypassGains(true); update(); flushUpdate(); initUI(); fit();
+  applyTheme(false); renderPresetSelect(''); buildSliders(); syncModes(); setBypassGains(true); update(); flushUpdate(); initUI(); fit(); applySink();
   requestAnimationFrame(frame);
   await store.init();
   try{ lib=await store.all(); }catch(e){ lib=[]; }
