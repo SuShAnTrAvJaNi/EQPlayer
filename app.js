@@ -1862,6 +1862,18 @@ document.addEventListener('keydown',e=>{
   else closeNP();
 });
 
+/* ---------- keyboard shortcuts (ignored while typing, on buttons and sliders, or in a dialog) ---------- */
+document.addEventListener('keydown',e=>{
+  if(e.ctrlKey||e.metaKey||e.altKey) return;
+  const t=e.target;
+  if(t.isContentEditable||/^(INPUT|TEXTAREA|SELECT|BUTTON|A)$/.test(t.tagName)||(t.closest&&t.closest('[role=slider],[role=switch]'))) return;
+  if(modal.classList.contains('show')||$('#themeWrap').classList.contains('show')) return;
+  if(e.key===' '||e.code==='Space'){ e.preventDefault(); playBtn.click(); }
+  else if(e.shiftKey&&e.key==='ArrowRight'){ e.preventDefault(); $('#next').click(); }
+  else if(e.shiftKey&&e.key==='ArrowLeft'){ e.preventDefault(); $('#prev').click(); }
+  else if(e.key==='m'||e.key==='M'){ e.preventDefault(); $('#muteBtn').click(); }
+});
+
 function initShell(){
   const sq=ls.get('eqp-queue',null);
   if(Array.isArray(sq)&&sq.length){ const ok=sq.filter(id=>byId(id)); if(ok.length){ queue=ok; qsrc='custom'; } }
