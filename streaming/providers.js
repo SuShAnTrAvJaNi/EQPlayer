@@ -111,7 +111,8 @@
     const err = u.searchParams.get('error');
     if (!code && !err) return null;
     history.replaceState(null, '', u.pathname);
-    const pk = JSON.parse(sessionStorage.getItem('eqp-spotify-pkce') || 'null');
+    let pk = null;
+    try { pk = JSON.parse(sessionStorage.getItem('eqp-spotify-pkce') || 'null'); } catch (e) { pk = null; }
     sessionStorage.removeItem('eqp-spotify-pkce');
     if (err) return { ok: false, msg: 'Spotify sign-in was cancelled.' };
     if (!pk || pk.state !== state) return { ok: false, msg: 'Spotify sign-in expired. Please try again.' };

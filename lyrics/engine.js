@@ -117,7 +117,22 @@
     return lines;
   }
 
-  function decodeSylt(d) {
+  // Reads the sample rate and samples per frame from the first MPEG frame header in the file.
+  // SYLT timestamps given in MPEG frames need these to become seconds.
+  function mpegTiming(full, from) {
+    const end = Math.min(full.length - 4, from + 65536);
+    for (let i = from; i < end; i++) {
+      if (full[i] !== 0xFF || (full[i + 1] & 0xE0) !== 0xE0) continue;
+      const verBits = (full[i + 1] >> 3) & 3, layer = (full[i + 1] >> 1) & 3, rateBits = (full[i + 2] >> 2) & 3;
+      if (verBits === 1 || layer === 0 || rateBits === 3) continue;
+      const table = verBits === 3 ? [44100, 48000, 32000] : verBits === 2 ? [22050, 24000, 16000] : [11025, 12000, 8000];
+      const spf = verBits === 3 ? 1152 : 576;   // MPEG-1 Layer III vs MPEG-2/2.5 Layer III
+      return { sr: table[rateBits], spf };
+    }
+    return { sr: 44100, spf: 1152 };
+  }
+
+  function decodeSylt(d, timing) {
     const enc = d[0];
     const fmt = d[4];                                     // 1 = MPEG frames, 2 = milliseconds
     const type = d[5];                                    // 1 = lyrics
@@ -134,8 +149,7 @@
       if (p + 4 > d.length) break;
       const ts = u32(d, p);
       p += 4;
-      // MPEG-frame timestamps are approximated at 44.1 kHz / 1152 samples per frame (about 26 ms).
-      entries.push({ t: fmt === 2 ? ts / 1000 : (ts * 1152) / 44100, text });
+      entries.push({ t: fmt === 2 ? ts / 1000 : (ts * timing.spf) / timing.sr, text });
     }
     return entries.length ? sylToLines(entries) : null;
   }
@@ -172,7 +186,7 @@
       }
       if (!d.length) continue;
       try {
-        if ((id === 'SYLT' || id === 'SLT') && !res.synced) res.synced = decodeSylt(d);
+        if ((id === 'SYLT' || id === 'SLT') && !res.synced) res.synced = decodeSylt(d, mpegTiming(full, 10 + size));
         else if ((id === 'USLT' || id === 'ULT') && !res.plain) res.plain = decodeUslt(d);
       } catch (e) { /* malformed frame: ignore it */ }
     }

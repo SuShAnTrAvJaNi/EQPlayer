@@ -2,6 +2,7 @@
       (function () {
         var KEY = 'eqp-cfg-v1';
         var o = {};
+        var cfgSp = document.getElementById('cfgSp'), cfgAm = document.getElementById('cfgAm'), cfgSave = document.getElementById('cfgSave');
         try { o = JSON.parse(localStorage.getItem(KEY) || '{}'); } catch (e) {}
         cfgSp.value = o.VITE_SPOTIFY_CLIENT_ID || '';
         cfgAm.value = o.VITE_APPLE_MUSIC_DEVELOPER_TOKEN || '';
@@ -62,7 +63,7 @@ const prefs=Object.assign({vol:1,shuffle:false,repeat:0,viz:'bars',eqm:'sl'},ls.
 let _spT=0, _ssT=0;
 const savePrefs=()=>{ clearTimeout(_spT); _spT=setTimeout(()=>ls.set('eqp-prefs',prefs),350); };
 const saveState=()=>{ clearTimeout(_ssT); _ssT=setTimeout(()=>ls.set('eqp-v4',state),350); };
-const flushSaves=()=>{ clearTimeout(_spT); clearTimeout(_ssT); ls.set('eqp-prefs',prefs); ls.set('eqp-v4',state); };
+const flushSaves=()=>{ clearTimeout(_spT); clearTimeout(_ssT); ls.set('eqp-prefs',prefs); ls.set('eqp-v4',state); try{ savePos(); }catch(e){} };
 addEventListener('pagehide',flushSaves); document.addEventListener('visibilitychange',()=>{ if(document.hidden) flushSaves(); });
 
 /* ---------- audio graph ----------
@@ -427,7 +428,6 @@ function submitModal(){
 mOk.onclick=submitModal;
 $('#mCancel').onclick=hideModal;
 modal.addEventListener('click',e=>{ if(e.target===modal) hideModal(); });   // tap the dimmed backdrop to dismiss
-document.addEventListener('keydown',e=>{ if(e.key==='Escape'&&modal.classList.contains('show')) hideModal(); });
 mInput.addEventListener('keydown',e=>{if(e.key==='Enter')submitModal();});
 let toastTimer=null;
 function toast(msg,ms){
@@ -438,7 +438,6 @@ function toast(msg,ms){
 /* ---------- responsive layout ----------
    No device picker or calibration: the layout follows the real viewport (100dvh + safe-area insets in CSS).
    This only toggles size classes that the EQ / meter CSS uses. */
-let scale=1;
 const stage=$('#stage');
 const typing=()=>{const a=document.activeElement;return !!a&&(a.tagName==='INPUT'&&a.type!=='range'&&a.type!=='file');};
 function fit(){
@@ -449,6 +448,9 @@ function fit(){
   cl.toggle('portrait',portrait); cl.toggle('landscape',!portrait);
   cl.toggle('phone',phone); cl.toggle('tablet',!phone);
   cl.toggle('short',vh<700); cl.toggle('tiny',vw<340); cl.toggle('squat',vh<340);
+  // landscape tablets and desktops get the two-column layout: Now Playing on the left, the current tab on the right
+  cl.toggle('wide',!portrait&&vw>=900);
+  ['library','eq','search'].forEach(x=>cl.toggle('r-'+x,curTab===x));
   sizeViz();
 }
 let fitTimer=null;
@@ -457,7 +459,6 @@ window.addEventListener('resize',safeFit);
 if(window.visualViewport) window.visualViewport.addEventListener('resize',safeFit);
 window.addEventListener('orientationchange',()=>{ setTimeout(fit,100); setTimeout(fit,500); });
 window.addEventListener('load',()=>{ setTimeout(fit,100); setTimeout(fit,600); });
-function pickerStart(){}
 function pickerEnd(){ setTimeout(fit,300); }
 
 /* ---------- bottom navigation, screens, menu, EQ sub-modes ---------- */
@@ -470,6 +471,7 @@ function setTab(t){
   curTab=t;
   const cl=stage.classList;
   ['library','eq','search'].forEach(x=>cl.toggle('t-'+x,x===t));
+  ['library','eq','search'].forEach(x=>cl.toggle('r-'+x,x===t));
   navBtns.forEach(b=>b.classList.toggle('act',b.dataset.t===t));
   if(t==='search') $('#search').focus();
   vizDirty=true; setTimeout(()=>{ sizeViz(); drawWave(); if(t==='library') scrollToCurrent(); },30);
@@ -595,7 +597,7 @@ function buildBars(){
 }
 function sizeViz(){
   const w=vc.clientWidth, h=vc.clientHeight; if(!w||!h) return;
-  vk=Math.min(2,Math.max(1,(window.devicePixelRatio||1)*Math.min(1,scale)));
+  vk=Math.min(2,Math.max(1,window.devicePixelRatio||1));
   const pw=Math.round(w*vk), ph2=Math.round(h*vk);
   if(vc.width!==pw||vc.height!==ph2){ vc.width=pw; vc.height=ph2; }
   vw=w; vh=h;
@@ -880,8 +882,6 @@ const setSeek=v=>{ seek.value=v; drawWave(); };
 /* ---- timeline scrubber (thumb-less; 4px at rest, 9px while touched) ---- */
 const scrub=$('#scrub'), scrubFill=$('#scrubFill'), curEl=$('#cur'), durEl=$('#dur');
 let wdrag=false, lastDurTxt='', lastNowAttr=-1;
-const WN=240, waveCache={};                                   // waveform peaks are no longer drawn
-function seedWave(){} function useWave(){} async function loadWave(){}
 function drawWave(){
   const dur=nowDur(), t=nowTime();
   const frac=wdrag?seek.value/1000:(dur>0?clamp(t/dur,0,1):0);
@@ -1026,6 +1026,7 @@ function ensureUnlocked(){
   try{ac.resume();}catch(e){}
   if(unlocked) return;
   unlocked=true; unlocking=true;
+  unlockWait=new Promise(r=>{ unlockRes=r; });
   let tmp=null;
   if(!audio.getAttribute('src')){ tmp=silentUrl(); audio.src=tmp; }
   const startSrc=audio.src, pos=audio.currentTime;
@@ -1038,6 +1039,7 @@ function ensureUnlocked(){
     }
     if(tmp) URL.revokeObjectURL(tmp);
     volNode.gain.value=userGain(); unlocking=false;
+    if(unlockRes){ const r=unlockRes; unlockRes=null; unlockWait=null; r(); }
   };
   let p; try{p=audio.play();}catch(e){}
   if(p&&p.then) p.then(done,done); else done();
@@ -1093,6 +1095,7 @@ function setCover(c){
   else paintArt(null);
 }
 function renderNow(t){
+  const vEl=$('#vol'); if(vEl){ vEl.disabled=!!(t&&t.source==='apple_music'); vEl.title=vEl.disabled?'Apple Music uses the device volume':''; }
   setTitle($('#tTitle'),t?t.title:'No track loaded');
   $('#tTitle2').textContent=t?t.title:''; $('#tArtist2').textContent=t?(t.artist||'Unknown artist'):'';
   $('#miniT').textContent=t?t.title:'Not playing'; $('#miniA').textContent=t?(t.artist||'Unknown artist'):' ';
@@ -1113,13 +1116,14 @@ async function loadTrack(id,opts){
   document.body.classList.remove('stream-dsp');
   if(SX.active()) SX.stop();
   const token=++loadToken;
-  curId=id; seedWave(id); renderNow(t); markCurrent(); scrollToCurrent(); setCover(null);
+  curId=id; curSlot=null; renderNow(t); markCurrent(); scrollToCurrent(); setCover(null);
   let buf=null;
   try{ buf=await store.blob(id); }catch(e){}
   if(token!==loadToken) return;
   if(!buf){ toast('Could not read this song. Try removing and adding it again.',3500); return; }
+  if(unlockWait) await unlockWait;
+  if(token!==loadToken) return;
   if(!t.fmt) t.fmt=audioFmt(buf,t.name);
-  loadWave(id,buf);
   $('#tBadge').textContent=t.fmt;
   const url=URL.createObjectURL(new Blob([buf],{type:t.mime||'audio/mpeg'}));
   const old=curUrl; curUrl=url; pendingPos=opts.pos||0;
@@ -1134,7 +1138,14 @@ async function loadTrack(id,opts){
   }
   store.cover(id).then(c=>{ if(token===loadToken){ setCover(c); setMediaSession(t); } }).catch(()=>{});
   setMediaSession(t);
-  savePos(true);
+  savePos();
+}
+function msPos(){
+  try{
+    if(!('mediaSession' in navigator)||!navigator.mediaSession.setPositionState) return;
+    if(curId==null||curIsStream()||srcId!==curId||!isFinite(audio.duration)||audio.duration<=0) return;
+    navigator.mediaSession.setPositionState({duration:audio.duration,playbackRate:1,position:Math.min(audio.currentTime,audio.duration)});
+  }catch(e){}
 }
 function setMediaSession(t){
   try{
@@ -1147,12 +1158,13 @@ function setMediaSession(t){
 function stopCurrent(){
   loadToken++; if(SX.active()) SX.stop(); audio.pause(); audio.removeAttribute('src'); audio.load(); lyrCancel(); lyrSetLines([],false); lyrShow('');
   if(curUrl){URL.revokeObjectURL(curUrl);curUrl=null;}
-  curId=null; srcId=null; ls.set('eqp-last',null); renderNow(null); markCurrent();
+  curId=null; curSlot=null; srcId=null; ls.set('eqp-last',null); renderNow(null); markCurrent();
   if('mediaSession' in navigator){ try{ navigator.mediaSession.metadata=null; }catch(e){} }
 }
 function nextId(dir){
   if(!queue.length) return null;
   let i=queue.indexOf(curId);
+  if(i<0&&curSlot!=null) i=dir>0?curSlot:curSlot+1;
   if(prefs.shuffle&&dir>0&&queue.length>1){ let r; do{r=Math.floor(Math.random()*queue.length);}while(r===i); return queue[r]; }
   if(i<0) i=dir>0?-1:queue.length;
   const n=i+dir;
@@ -1166,7 +1178,7 @@ function nextId(dir){
 // only audio is imported, and a .lrc is paired with its MP3 by name anywhere in the same pick.
 ['files','folderIn'].forEach(id=>{
   const inp=$('#'+id);
-  inp.addEventListener('click',()=>{ pickerStart(); ensureUnlocked(); });
+  inp.addEventListener('click',()=>{ ensureUnlocked(); });
   inp.addEventListener('cancel',pickerEnd);
   inp.onchange=async e=>{
     pickerEnd();
@@ -1270,15 +1282,27 @@ const kick=()=>{ try{ const p=ac.resume(); if(p&&p.catch) p.catch(()=>{}); }catc
 const elBroken=()=>!audio.getAttribute('src')||!!audio.error;
 function lastPos(){ const l=ls.get('eqp-last',null); return audio.currentTime>0?audio.currentTime:(l&&l.id===curId?(l.pos||0):0); }
 let wantPlay=false;                 // what the user asked for: true after ▶, false after ⏸
+let curSlot=null;
+let unlockWait=null, unlockRes=null;   // set while the silent iOS unlock is still running                   // where the playing song sat in the queue, once it has been removed from it
 function reloadCurrent(play,why){
   if(curId==null) return;
   if(why) toast(why,2200);
   loadTrack(curId,{play:play&&wantPlay,pos:lastPos()});
 }
 let wd=null;
+// Restores the last song's name, cover and position without reading its audio.
+// The file is read the first time Play, Next or a seek needs it.
+function primeLast(t,pos){
+  curId=t.id; curSlot=null; srcId=null; pendingPos=pos; renderNow(t); markCurrent(); scrollToCurrent(); setCover(null);
+  if(t.fmt) $('#tBadge').textContent=t.fmt;
+  $('#cur').textContent=fmtTime(pos); $('#dur').textContent='0:00';
+  setMediaSession(t);
+  store.cover(t.id).then(c=>{ if(curId===t.id) setCover(c); }).catch(()=>{});
+}
 function startPlayback(){
   kick();
   wantPlay=true;
+  if(curId!=null&&srcId!==curId&&!curIsStream()){ loadTrack(curId,{play:true,pos:pendingPos}); return; }
   if(elBroken()){ reloadCurrent(true,'Reconnecting the song…'); return; }
   const t0=audio.currentTime;
   const p=audio.play();
@@ -1334,6 +1358,7 @@ audio.addEventListener('loadedmetadata',()=>{
   if(isFinite(audio.duration)) pendingPos=0;
 });
 audio.addEventListener('timeupdate',()=>{
+  msPos();
   if(!seeking){ $('#cur').textContent=fmtTime(audio.currentTime); if(audio.duration) setSeek(Math.round(audio.currentTime/audio.duration*1000)); }
   const now=Date.now(); if(now-lastSave>1500){ lastSave=now; savePos(); }
 });
@@ -1342,14 +1367,17 @@ vol.value=prefs.vol; fillR(vol);
 vol.oninput=()=>{ prefs.vol=+vol.value; if(prefs.muted){ prefs.muted=false; syncMute(); } fillR(vol); savePrefs(); if(SX.active()) SX.setVolume(prefs.vol); volNode.gain.setTargetAtTime(userGain(),ac.currentTime,0.02); };
 $('#search').addEventListener('input',e=>{ filter=e.target.value; renderSearch(); });
 $('#search').addEventListener('keydown',e=>{ if(e.key==='Enter') e.target.blur(); });
-window.addEventListener('pagehide',()=>savePos(true));
-document.addEventListener('visibilitychange',()=>{ if(document.hidden) savePos(true); else { checkSleep(); wakeUp(); } });
+document.addEventListener('visibilitychange',()=>{ if(!document.hidden){ checkSleep(); wakeUp(); } });
 try{
   if('mediaSession' in navigator){
-    navigator.mediaSession.setActionHandler('play',()=>{audio.play().catch(()=>{});});
-    navigator.mediaSession.setActionHandler('pause',()=>{ wantPlay=false; audio.pause(); });
-    navigator.mediaSession.setActionHandler('previoustrack',()=>$('#prev').click());
-    navigator.mediaSession.setActionHandler('nexttrack',()=>$('#next').click());
+    const ms=(a,f)=>{ try{ navigator.mediaSession.setActionHandler(a,f); }catch(e){} };
+    ms('play',()=>{ if(curId==null){ playBtn.click(); return; } if(curIsStream()){ if(!SX.isPlaying()) SX.toggle(); return; } kick(); startPlayback(); });
+    ms('pause',()=>{ if(curIsStream()){ if(SX.isPlaying()) SX.toggle(); return; } wantPlay=false; pauseAt=performance.now(); audio.pause(); });
+    ms('previoustrack',()=>$('#prev').click());
+    ms('nexttrack',()=>$('#next').click());
+    ms('seekto',d=>{ if(d&&d.seekTime!=null) seekTo(d.seekTime); });
+    ms('seekbackward',d=>seekTo((curIsStream()?SX.position():audio.currentTime)-((d&&d.seekOffset)||10)));
+    ms('seekforward',d=>seekTo((curIsStream()?SX.position():audio.currentTime)+((d&&d.seekOffset)||10)));
   }
 }catch(e){}
 
@@ -1407,6 +1435,7 @@ const nowTime=()=>curIsStream()?SX.position():(audio.currentTime||0);
 const nowDur=()=>curIsStream()?SX.duration():(isFinite(audio.duration)?audio.duration:0);
 function seekTo(sec){
   if(curIsStream()){ SX.seek(sec); return; }
+  if(curId!=null&&srcId!==curId){ pendingPos=Math.max(0,sec); $('#cur').textContent=fmtTime(pendingPos); return; }   // file not read yet: remember the spot
   const d=nowDur(); if(d>0) audio.currentTime=clamp(sec,0,d);
 }
 const SP_=window.StreamingProviders||{
@@ -1453,7 +1482,8 @@ function lyrBlur(ans){
   const g=ans>=0?lyr.grp[ans]:-1;
   for(let i=0;i<lyr.els.length;i++){
     const d=ans<0?3:Math.abs(lyr.grp[i]-g);
-    lyr.els[i].style.filter=d===0?'':'blur('+(d===1?1:2.5)+'px)';
+    const f=d===0?'':'blur('+(d===1?1:2.5)+'px)', el=lyr.els[i];
+    if(el._f!==f){ el._f=f; el.style.filter=f; }   // write only when the blur changes, not on every line
   }
 }
 function lyrCancel(){ lyr.id++; if(lyr.ac){ lyr.ac.abort(); lyr.ac=null; } lyr.req=null; }
@@ -1653,7 +1683,7 @@ async function loadStreamTrack(t,opts){
   loadToken++;
   audio.pause(); audio.removeAttribute('src'); audio.load(); srcId=null;
   if(curUrl){ URL.revokeObjectURL(curUrl); curUrl=null; }
-  curId=t.id; seedWave(t.id); renderNow(t); markCurrent(); scrollToCurrent();
+  curId=t.id; curSlot=null; renderNow(t); markCurrent(); scrollToCurrent();
   document.body.classList.add('stream-dsp');
   setCover(null);
   if(t.art) paintArt(t.art);
@@ -1795,8 +1825,8 @@ function qRender(){
   if(!queue.length) qList.innerHTML='<div class="empty">Nothing queued</div>';
 }
 function qRemoveAt(i){
-  const id=queue[i]; queue.splice(i,1); saveQueue();
-  if(id===curId){ /* the song keeps playing; it just leaves the queue */ }
+  const id=queue[i]; if(id===curId) curSlot=i-1;   // the song keeps playing; Next and Prev count from its old slot
+  queue.splice(i,1); saveQueue();
   qRender(); renderNowTrackNo();
 }
 function renderNowTrackNo(){ const t=curId!=null?byId(curId):null; if(t){ const pos=queue.indexOf(t.id); $('#tSub').textContent=(t.album?t.album+' · ':'')+(pos>=0?'Track '+(pos+1)+' of '+queue.length:''); } }
@@ -1939,7 +1969,7 @@ async function init(){
   initGlue();
   // restore the last song and position (paused; only this one song is read from storage)
   const last=ls.get('eqp-last',null);
-  if(last&&byId(last.id)){ loadTrack(last.id,{play:false,pos:last.pos||0}); }
+  if(last&&byId(last.id)){ const lt=byId(last.id); if(isStreamTrack(lt)) loadTrack(last.id,{play:false,pos:last.pos||0}); else primeLast(lt,last.pos||0); }
   else renderNow(null);
 }
 init();
