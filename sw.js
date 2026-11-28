@@ -1,13 +1,20 @@
-const C='eqp-v14';
-const FILES=['./','./index.html','./config.js','./manifest.json','./icon-180.png','./icon-192.png','./icon-512.png','./lyrics/engine.js','./lyrics/worker.js','./streaming/providers.js'];
+const C='eqp-v15';
+const X='eqp-ext-v1';   // third-party libraries (Whisper runtime, WASM): cache-first, kept across app versions
+const FILES=['./','./index.html','./styles.css','./app.js','./config.js','./manifest.json','./icon-180.png','./icon-192.png','./icon-512.png','./lyrics/engine.js','./lyrics/worker.js','./streaming/providers.js'];
 // No skipWaiting on install: a new version waits until the page asks for it (the "Update available" button).
 self.addEventListener('install',e=>{e.waitUntil(caches.open(C).then(c=>c.addAll(FILES)));});
 self.addEventListener('message',e=>{if(e.data==='skip')self.skipWaiting();});
-self.addEventListener('activate',e=>{e.waitUntil(caches.keys().then(k=>Promise.all(k.filter(x=>x!==C).map(x=>caches.delete(x)))).then(()=>self.clients.claim()));});
+self.addEventListener('activate',e=>{e.waitUntil(caches.keys().then(k=>Promise.all(k.filter(x=>x!==C&&x!==X).map(x=>caches.delete(x)))).then(()=>self.clients.claim()));});
 self.addEventListener('fetch',e=>{
   const q=e.request;
   if(q.method!=='GET')return;
-  if(new URL(q.url).origin!==self.location.origin)return; // never cache third-party API/auth traffic
+  if(new URL(q.url).origin!==self.location.origin){
+    // Only the Transformers.js library and its WASM are cached (jsdelivr, CORS). Auth and API traffic is never cached.
+    if(q.url.startsWith('https://cdn.jsdelivr.net/')){
+      e.respondWith(caches.open(X).then(c=>c.match(q).then(m=>m||fetch(q).then(r=>{ if(r&&r.ok) c.put(q,r.clone()); return r; }))).catch(()=>Response.error()));
+    }
+    return;
+  }
   e.respondWith(fetch(q).then(r=>{
     if(r&&r.ok){const cp=r.clone();caches.open(C).then(c=>c.put(q,cp));} // only cache good responses
     return r;

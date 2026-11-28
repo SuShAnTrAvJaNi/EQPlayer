@@ -13,6 +13,7 @@ self.onmessage = async (e) => {
     if (m.type === 'init') {
       const { pipeline, env } = await import(m.transformersUrl);
       env.allowLocalModels = false;
+      env.useBrowserCache = true;   // model files are kept in Cache Storage after the first download, so Whisper runs offline
       pipe = await pipeline('automatic-speech-recognition', m.model, {
         device: m.device,
         dtype: 'q8',
