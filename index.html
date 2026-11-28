@@ -43,9 +43,15 @@ st.setProperty('--acc',c);st.setProperty('--acc2','hsl('+(h-4)+' '+s+'% 48%)');}
         <button id="favBtn" class="cbtn" aria-label="Favorite" aria-pressed="false"><svg class="s" viewBox="0 0 24 24"><path d="M12 20.5s-7.5-4.6-9.2-9.3C1.6 7.9 3.6 5 6.6 5c1.9 0 3.5 1 5.4 3 1.9-2 3.5-3 5.4-3 3 0 5 2.900 3.800 6.200C19.500 15.900 12 20.500 12 20.500z"/></svg></button>
         <button id="moreBtn" class="cbtn" aria-label="More" aria-haspopup="menu" aria-expanded="false"><svg class="f" viewBox="0 0 24 24"><circle cx="5.500" cy="12" r="1.800"/><circle cx="12" cy="12" r="1.800"/><circle cx="18.500" cy="12" r="1.800"/></svg></button>
       </div>
-      <div id="scrub" role="slider" tabindex="0" aria-label="Seek" aria-valuemin="0" aria-valuemax="0" aria-valuenow="0" aria-valuetext="0:00"><i id="scrubFill"></i></div>
+      <div id="abBar" hidden>
+        <span class="ab-lbl">A–B Loop</span>
+        <button id="abSetA" class="ab-btn">Set A</button>
+        <button id="abSetB" class="ab-btn">Set B</button>
+        <button id="abClear" class="ab-btn">Clear</button>
+      </div>
+      <div id="scrub" role="slider" tabindex="0" aria-label="Seek" aria-valuemin="0" aria-valuemax="0" aria-valuenow="0" aria-valuetext="0:00"><i id="scrubLoop"></i><i id="scrubFill"></i></div>
       <input type="range" id="seek" min="0" max="1000" value="0" aria-label="Seek position" tabindex="-1" hidden>
-      <div class="timerow"><span id="cur">0:00</span><div id="tBadge"></div><span id="dur">0:00</span></div>
+      <div class="timerow"><span id="cur">0:00</span><div class="tmid"><div id="tBadge"></div><button id="spdBtn" class="tchip" aria-label="Playback speed">1.0×</button><button id="abBtn" class="tchip" aria-label="A-B loop">A–B</button></div><span id="dur">0:00</span></div>
       <div class="transport">
         <button id="prev" aria-label="Previous"></button>
         <button id="play" class="big" aria-label="Play or pause"></button>
@@ -67,14 +73,18 @@ st.setProperty('--acc',c);st.setProperty('--acc2','hsl('+(h-4)+' '+s+'% 48%)');}
 
 <section class="screen card" id="sLibrary">
   <h1 class="ltitle">Library</h1>
-  <div class="row">
-    <div class="pills" id="libTabs"><button data-lt="songs" class="on">All Songs</button><button data-lt="albums">Albums</button><button data-lt="artists">Artists</button></div>
+  <div class="row lib-top">
+    <div class="pills" id="libTabs"><button data-lt="songs" class="on">All Songs</button><button data-lt="folders">Folders</button><button data-lt="albums">Albums</button><button data-lt="artists">Artists</button><button data-lt="favs">Favorites</button><button data-lt="playlists">Playlists</button></div>
+  </div>
+  <div class="row lib-acts">
     <label class="btn primary" for="files" id="addLbl">＋ Add MP3s</label>
     <label class="btn" for="folderIn" id="addFolder">Folder</label>
+    <button id="mountFolder" title="Link a folder directly from disk without copying files" hidden>Mount USB</button>
     <input type="file" id="files" accept="audio/mpeg,audio/mp3,audio/*,.mp3,.lrc" multiple>
     <input type="file" id="folderIn" webkitdirectory directory multiple>
+    <input type="file" id="presetIn" accept=".json,.txt,application/json,text/plain" hidden>
   </div>
-  <div class="row" id="libCrumb"><button id="libBack">‹ Back</button><span id="libTitle"></span></div>
+  <div class="row" id="libCrumb"><button id="libBack">‹ Back</button><span id="libTitle"></span><button id="libPlayAll" hidden>▶ Play</button><button id="libAddToPl" hidden>＋ Playlist</button><button id="plRename" hidden>Rename</button><button id="plDel" class="danger" hidden>Delete</button></div>
   <div class="list" id="list"><div class="empty">Loading…</div></div>
   <div class="row">
     <div class="stor"><div class="bar"><div id="storBar"></div></div><div class="txt" id="storTxt">Library</div></div>
@@ -90,6 +100,9 @@ st.setProperty('--acc',c);st.setProperty('--acc2','hsl('+(h-4)+' '+s+'% 48%)');}
     <select id="preset" aria-label="Preset"></select>
     <button id="savePreset">Save</button>
     <button id="delPreset" disabled>Delete</button>
+    <button id="impPreset" title="Import JSON preset or AutoEQ ParametricEQ.txt">Import</button>
+    <button id="expPreset" title="Export current EQ settings as JSON">Export</button>
+    <button id="paramTog" class="tog" title="Edit each band's frequency, Q factor, and filter type">Param</button>
     <button id="auto" title="Lowers the preamp a little when you boost, to avoid clipping">Headroom</button>
     <button id="reset">Reset</button>
   </div>
@@ -109,7 +122,23 @@ st.setProperty('--acc',c);st.setProperty('--acc2','hsl('+(h-4)+' '+s+'% 48%)');}
       <span class="mlim" id="mlim"></span>
       <button id="clip" class="clipbtn" title="Lights when the signal goes over 0 dB. Tap to clear.">CLIP</button>
     </div>
-    <div class="grline"><span class="lab">Limiter</span><span id="mlimTxt"></span><span class="sp"></span><span class="lab">Headroom GR</span><output id="grRead" aria-label="Auto-headroom gain reduction (read only)">0.0 dB</output></div>
+    <div class="grline"><span class="lab">Limiter</span><span id="mlimTxt"></span><span class="sp"></span><span id="rgRead"></span><span class="lab">Headroom GR</span><output id="grRead" aria-label="Auto-headroom gain reduction (read only)">0.0 dB</output></div>
+    <div id="paramBar" hidden>
+      <div class="pbar-top">
+        <span class="lab" id="pBandLbl">Band 1</span>
+        <select id="pType" aria-label="Filter type">
+          <option value="peaking">Peak</option>
+          <option value="lowshelf">Low Shelf</option>
+          <option value="highshelf">High Shelf</option>
+        </select>
+        <button id="pResetBand">Reset band</button>
+        <button id="pClose" aria-label="Close parametric editor">✕</button>
+      </div>
+      <div class="pbar-ctrls">
+        <label class="pctl"><span>Freq <output id="pFreqO">31 Hz</output></span><input type="range" id="pFreq" min="0" max="1000" value="0" aria-label="Band frequency"></label>
+        <label class="pctl"><span>Q <output id="pQO">1.41</output></span><input type="range" id="pQ" min="0.2" max="12" step="0.05" value="1.41" aria-label="Band Q factor"></label>
+      </div>
+    </div>
     <div class="bands" id="bands"></div>
   </div>
 
@@ -161,6 +190,10 @@ st.setProperty('--acc',c);st.setProperty('--acc2','hsl('+(h-4)+' '+s+'% 48%)');}
   <div id="qList"></div>
 </div>
 <div id="morePop" role="menu" aria-label="More" hidden>
+  <button id="addPlCur" role="menuitem">Add to playlist…</button>
+  <button id="trkEqBtn" role="menuitem">Track EQ <span id="trkEqLbl">Global</span></button>
+  <button id="spdMenuBtn" role="menuitem">Playback speed <span id="spdMenuLbl">1.0×</span></button>
+  <button id="abMenuBtn" role="menuitem">A–B loop <span id="abMenuLbl">Off</span></button>
   <button id="sleepBtn" role="menuitem">Sleep timer <span id="sleepLeft"></span></button>
   <button id="catPrev" role="menuitem">Previous album</button>
   <button id="catNext" role="menuitem">Next album</button>
@@ -174,12 +207,31 @@ st.setProperty('--acc',c);st.setProperty('--acc2','hsl('+(h-4)+' '+s+'% 48%)');}
   </div>
   <div class="msec" id="outSec"><span class="lab">Audio Output</span>
     <div class="mrow" id="outRow"><span>Output device<small id="outNote">Where the sound plays</small></span><select id="outDev" aria-label="Output device"></select></div>
+    <button class="mrow sw-row" id="devEqTog" role="switch" aria-checked="false"><span>Auto-switch EQ per device<small>apply saved preset when output changes</small></span><i class="switch"></i></button>
+    <div class="mrow" id="devEqRow"><span>Preset for output<small id="devEqNote">System default</small></span><select id="devEqSel" aria-label="EQ preset for current output device"></select></div>
   </div>
   <div class="msec"><span class="lab">Accent Colour Theme</span>
     <button class="mrow" id="themeBtn"><span>Colour theme</span><i class="swdot"></i></button>
   </div>
   <div class="msec"><span class="lab">Audio Engine</span>
     <button class="mrow tog" id="autoM"><span>Headroom</span><small>auto preamp</small></button>
+    <div class="mrow"><span>Loudness (ReplayGain)<small>normalize track volume</small></span>
+      <select id="rgMode" aria-label="Loudness normalization">
+        <option value="off">Off</option>
+        <option value="auto">Auto (Tag + Scan)</option>
+        <option value="scan">Always Scan (-14 LUFS)</option>
+      </select>
+    </div>
+    <div class="mrow"><span>Crossfade<small>smooth blend between local tracks</small></span>
+      <select id="xfadeSel" aria-label="Crossfade duration">
+        <option value="0">Off</option>
+        <option value="2">2 seconds</option>
+        <option value="4">4 seconds</option>
+        <option value="6">6 seconds</option>
+        <option value="8">8 seconds</option>
+        <option value="12">12 seconds</option>
+      </select>
+    </div>
     <div class="note2">Limiter: −3 dB threshold · 6 dB knee · 12:1 · attack 3 ms · release 180 ms. Headroom trims the output automatically when you boost (shown as GR, your preamp stays put).</div>
   </div>
   <div class="msec glass-sec"><span class="lab">Lyrics</span>
@@ -222,12 +274,18 @@ st.setProperty('--acc',c);st.setProperty('--acc2','hsl('+(h-4)+' '+s+'% 48%)');}
   <input type="text" id="mInput" maxlength="30" autocomplete="off">
   <div class="btns"><button id="mCancel">Cancel</button><button id="mOk" class="on">OK</button></div>
 </div></div>
+<div id="pickModal" role="dialog" aria-modal="true" hidden><div class="box">
+  <h2 id="pickTitle">Choose</h2>
+  <div id="pickList" class="pick-list"></div>
+  <div class="btns"><button id="pickCancel">Cancel</button></div>
+</div></div>
 <button id="updBar" hidden>Update available. Tap to reload.</button>
 <div id="toast" role="status" aria-live="polite"></div>
 </div>
 
 
 <script src="config.js"></script>
+<script src="dsp/helpers.js"></script>
 <script src="lyrics/engine.js"></script>
 <script src="streaming/providers.js"></script>
 <script src="app.js"></script>

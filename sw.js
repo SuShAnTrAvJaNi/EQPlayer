@@ -1,6 +1,6 @@
-const C='eqp-v19';
+const C='eqp-v20';
 const X='eqp-ext-v1';   // third-party libraries (Whisper runtime, WASM): cache-first, kept across app versions
-const FILES=['./','./index.html','./styles.css','./app.js','./config.js','./manifest.json','./icon-180.png','./icon-192.png','./icon-512.png','./lyrics/engine.js','./lyrics/worker.js','./streaming/providers.js'];
+const FILES=['./','./index.html','./styles.css','./app.js','./config.js','./dsp/helpers.js','./manifest.json','./icon-180.png','./icon-192.png','./icon-512.png','./lyrics/engine.js','./lyrics/worker.js','./streaming/providers.js'];
 // No skipWaiting on install: a new version waits until the page asks for it (the "Update available" button).
 self.addEventListener('install',e=>{e.waitUntil(caches.open(C).then(c=>c.addAll(FILES)));});
 self.addEventListener('message',e=>{if(e.data==='skip')self.skipWaiting();});

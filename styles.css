@@ -551,3 +551,59 @@ body.idle .orb,#stage:not(.np-open) #sPlayer .orb{animation-play-state:paused}
 #stage.menu-open #screens{display:none}
 #stage.t-library #sLibrary,#stage.t-eq #sEq,#stage.t-search #sSearch{animation:tabIn .38s var(--ease)}
 body.no-motion *,body.no-motion *::before,body.no-motion *::after{transition-duration:0s!important;transition-delay:0s!important;animation-duration:0s!important;animation-delay:0s!important}
+
+/* ---- Library: 6 tabs, USB Folder browser, Playlists ---- */
+.lib-top{min-width:0}
+#libTabs{overflow-x:auto;scrollbar-width:none;-webkit-overflow-scrolling:touch;padding-bottom:2px}
+#libTabs::-webkit-scrollbar{display:none}
+#libTabs button{flex:0 0 auto;padding:0 12px;min-height:36px;font-size:13px}
+.lib-acts{flex-wrap:wrap;gap:6px}
+.lib-acts .btn,.lib-acts button{min-height:36px;padding:0 12px;font-size:13px}
+#libCrumb{flex-wrap:wrap;gap:6px}
+#libCrumb button{min-height:32px;padding:0 10px;font-size:12px;border-radius:999px}
+#libPlayAll{background:var(--acc);color:#fff;border-color:transparent}
+.grp.folder-row .gi{background:rgba(var(--rgb),.16);border-color:rgba(var(--rgb),.45);color:var(--acc)}
+.grp.folder-row .gi svg{width:18px;height:18px}
+.track .addpl{min-height:40px;width:36px;padding:0;border:none;background:transparent;box-shadow:none;color:var(--mut);font-size:18px;font-weight:500}
+.track .addpl:active{color:var(--acc)}
+.grp .gplay{min-height:32px;padding:0 10px;border-radius:999px;font-size:12px;background:rgba(var(--rgb),.16);color:var(--acc);border-color:rgba(var(--rgb),.35);box-shadow:none}
+.pl-new-row{display:flex;align-items:center;gap:8px;padding:8px 4px;border-bottom:.5px solid rgba(255,255,255,.1)}
+.pl-new-row button{min-height:38px;border-radius:999px;padding:0 14px;font-size:13px}
+
+/* ---- Now Playing: A-B loop & Speed chips ---- */
+.tmid{display:flex;align-items:center;justify-content:center;gap:6px;min-width:0;flex:1}
+.tchip{min-height:22px;padding:2px 8px;border-radius:999px;border:.5px solid rgba(255,255,255,.24);background:rgba(255,255,255,.08);color:rgba(255,255,255,.78);font-size:11px;font-weight:700;box-shadow:none;line-height:1.2;white-space:nowrap}
+.tchip.on{background:var(--acc);color:#fff;border-color:transparent}
+#abBar{display:flex;align-items:center;gap:6px;padding:4px 8px;border-radius:12px;background:rgba(255,255,255,.08);border:.5px solid rgba(255,255,255,.16);flex:none}
+#abBar .ab-lbl{flex:1;font-size:12px;font-weight:600;color:rgba(255,255,255,.8);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;font-variant-numeric:tabular-nums}
+#abBar .ab-btn{min-height:28px;padding:0 10px;border-radius:999px;font-size:12px}
+#scrubLoop{position:absolute;top:50%;height:6px;margin-top:-3px;border-radius:99px;background:rgba(var(--rgb),.55);pointer-events:none;display:none}
+#scrubLoop.on{display:block}
+#morePop{width:250px}
+
+/* ---- Parametric Band Inspector ---- */
+#paramBar{display:flex;flex-direction:column;gap:6px;padding:8px 10px;border-radius:14px;background:rgba(255,255,255,.07);border:.5px solid rgba(255,255,255,.16);flex:none}
+.pbar-top{display:flex;align-items:center;gap:6px}
+.pbar-top .lab{flex:1;color:var(--acc)}
+.pbar-top select,.pbar-top button{min-height:30px;padding:0 10px;font-size:12px;border-radius:8px}
+#pClose{width:30px;padding:0}
+.pbar-ctrls{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.pctl{display:flex;flex-direction:column;gap:2px;font-size:11px;color:rgba(255,255,255,.7)}
+.pctl span{display:flex;justify-content:space-between;font-weight:600}
+.pctl output{color:var(--acc);font-variant-numeric:tabular-nums}
+.pctl input[type=range]{height:24px;margin:0}
+.bcol .bf{cursor:pointer;border-radius:4px;transition:background .15s,color .15s}
+.bcol.sel .bf{background:rgba(var(--rgb),.25);color:var(--acc)}
+.grline #rgRead{font-size:11px;color:rgba(255,255,255,.65);margin-right:4px;font-variant-numeric:tabular-nums}
+
+/* ---- Picker Modal & Settings selects ---- */
+#pickModal{position:absolute;inset:0;z-index:82;display:none;align-items:center;justify-content:center;background:rgba(0,0,0,.5)}
+#pickModal.show{display:flex}
+#pickModal .box{width:400px;max-width:90%;max-height:78vh;background:rgba(28,28,32,.86);-webkit-backdrop-filter:blur(48px) saturate(190%);backdrop-filter:blur(48px) saturate(190%);border:.5px solid rgba(255,255,255,.18);border-radius:16px;padding:16px;display:flex;flex-direction:column;gap:10px;box-shadow:0 12px 40px #000}
+#pickModal .box h2{margin:0;font-size:17px}
+.pick-list{display:flex;flex-direction:column;gap:6px;overflow:auto;max-height:52vh}
+.pick-list button{width:100%;justify-content:space-between;min-height:42px;border-radius:12px;padding:0 12px;text-align:left}
+.pick-list button.on{background:var(--acc);color:#fff}
+#pickModal .btns{display:flex;justify-content:flex-end}
+#devEqSel,#rgMode,#xfadeSel{max-width:54%;min-height:36px;padding:0 26px 0 10px;font-size:13px}
+

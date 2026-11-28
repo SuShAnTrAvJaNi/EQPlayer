@@ -1,0 +1,5 @@
+{
+  "name": "EQ Player",
+  "description": "A parametric EQ music player with Web Audio DSP, reverb, synced lyrics, and optional streaming integration.",
+  "requestFramePermissions": []
+}

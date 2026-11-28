@@ -1,0 +1,16 @@
+{
+  "name": "eq-player",
+  "version": "1.0.0",
+  "private": true,
+  "description": "A parametric EQ music player that runs in the browser as a Progressive Web App.",
+  "scripts": {
+    "dev": "node server.js",
+    "start": "node server.js",
+    "build": "node --check server.js && node --check app.js && node --check config.js && node --check dsp/helpers.js && node --check sw.js && node --check lyrics/engine.js && node --check lyrics/worker.js && node --check streaming/providers.js && node --check tests/engine.test.js",
+    "lint": "node --check server.js && node --check app.js && node --check config.js && node --check dsp/helpers.js && node --check sw.js && node --check lyrics/engine.js && node --check lyrics/worker.js && node --check streaming/providers.js && node --check tests/engine.test.js",
+    "test": "node tests/engine.test.js"
+  },
+  "dependencies": {
+    "express": "^4.21.2"
+  }
+}
